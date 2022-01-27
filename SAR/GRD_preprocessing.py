@@ -1,217 +1,255 @@
-"""
-S1-GRD preprocessing routine
-
-Author: Jales Bussinguer
-"""
-
-# Imports
-# Basic Libraryimport numpy as np
-
-# Snappy modules
 from snappy import ProductIO
 from snappy import HashMap
 from snappy import GPF
-from snappy import jpy
-from snappy import WKTReader
 
-# def subset_by_shape(data, shape):
-    
-#     g = []
+import geopandas as gpd
+from shapely.geometry import Polygon
 
-#     wkt = str(m.wkt).replace('MULTIPOINT', 'POLYGON(') +')'
+import os, gc
 
-#     SubsetOp = jpy.get_type('org.esa.snap.core.gpf.common.SubsetOp')
+# EPSG: 3857
+proj_3857 = '''PROJCS["WGS 84 / Pseudo-Mercator", GEOGCS["WGS 84", DATUM["World Geodetic System 1984", SPHEROID["WGS 84", 6378137.0, 298.257223563, AUTHORITY["EPSG","7030"]], AUTHORITY["EPSG","6326"]], PRIMEM["Greenwich", 0.0, AUTHORITY["EPSG","8901"]], UNIT["degree", 0.017453292519943295], AXIS["Geodetic longitude", EAST], AXIS["Geodetic latitude", NORTH], AUTHORITY["EPSG","4326"]], PROJECTION["Popular Visualisation Pseudo Mercator", AUTHORITY["EPSG","1024"]], PARAMETER["semi_minor", 6378137.0], PARAMETER["latitude_of_origin", 0.0], PARAMETER["central_meridian", 0.0], PARAMETER["scale_factor", 1.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["m", 1.0], AXIS["Easting", EAST], AXIS["Northing", NORTH], AUTHORITY["EPSG","3857"]]'''
 
-#     limites = wkt
+proj_32722 = '''PROJCS["WGS 84 / UTM zone 22S", GEOGCS["WGS 84", DATUM["World Geodetic System 1984", SPHEROID["WGS 84", 6378137.0, 298.257223563, AUTHORITY["EPSG","7030"]], AUTHORITY["EPSG","6326"]], PRIMEM["Greenwich", 0.0, AUTHORITY["EPSG","8901"]], UNIT["degree", 0.017453292519943295], AXIS["Geodetic longitude", EAST], AXIS["Geodetic latitude", NORTH], AUTHORITY["EPSG","4326"]], PROJECTION["Transverse_Mercator", AUTHORITY["EPSG","9807"]], PARAMETER["central_meridian", -51.0], PARAMETER["latitude_of_origin", 0.0], PARAMETER["scale_factor", 0.9996], PARAMETER["false_easting", 500000.0], PARAMETER["false_northing", 10000000.0], UNIT["m", 1.0], AXIS["Easting", EAST], AXIS["Northing", NORTH], AUTHORITY["EPSG","32722"]]'''
 
-#     geometria = WKTReader().read(limites)
-
-#     HashMap = jpy.get_type('java.util.HashMap')
-#     GPF.getDefaultInstance().getOperatorSpiRegistry().loadOperatorSpis()
-
-#     parameters = HashMap()
-#     parameters.put('copyMetadata', True)
-#     parameters.put('geoRegion', geometria)
-
-#     subset = GPF.createProduct('Subset', parameters, data)
-    
-#     return subset
-
-# Ortorretificação (Orthorectification) - Apply Orbit File
-
-def apply_orbit_file(data):
+def operator_help(operator):
 
     """
-    Apply Orbit File
+    Operator parameters help - for developers only!
+
+    Shows the parameters of a operator, its default values and a set of other values.
 
     Args:
-        data ([type]): [description]
-
+    operator (string) = Operator name or alias
+    
     Returns:
-        [type]: [description]
+        Parameter infos of a operator (array)
     """
 
-    print('Aplying Orbit File...')
+    op_spi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(operator)
+    print('Operator name: {}'.format(op_spi.getOperatorDescriptor().getName()))
+    print('Operator alias: {}\n'.format(op_spi.getOperatorDescriptor().getAlias()))
+    print('PARAMETERS:\n')
+
+    param_Desc = op_spi.getOperatorDescriptor().getParameterDescriptors()
+        
+    for param in param_Desc:
+        print('{}: {}\nDefault Value: {}'.format(param.getName(), param.getDescription(), param.getDefaultValue()))
+            
+        value_set = param.getValueSet()
+        print(f'Possible other values: {list(value_set)}\n')
+
+def ApplyOrbitFile(source):
+
+    """
+    Orbit Correction Operator
+
+    The orbit state vectors provided in the metadata of a SAR product are generally not accurate and can be refined with the precise orbit files which are available days-to-weeks after the generation of the product.
+    The orbit file provides accurate satellite position and velocity information. Based on this information, the orbit state vectors in the abstract metadata of the product are updated.
+
+    Args:
+    source (array) = Sentinel-1 product
+    
+    Returns:
+        Orbit corrected image (array)
+    """
 
     parameters = HashMap()
 
-    parameters.put('orbitType', 'Sentinel Precise (Auto Download)')
-    parameters.put('polyDegree', '3')
-    parameters.put('continueOnFail', 'false')
+    parameters.put('orbitType', 'Sentinel Precise (Auto Download)') # Orbit type
+    parameters.put('polyDegree', '3') # Polynomial Degree
+    parameters.put('continueOnFail', 'false') # Stop the code if the orbit metadata can't be found
 
-    return GPF.createProduct('Apply-Orbit-File', parameters, data)
+    return GPF.createProduct('Apply-Orbit-File', parameters, source)
 
-# Informações - Information
-
-def ProductInformation(data):
-
-    """
-    Gets the product basic informations
-
-    Args:
-        data
-
-    Returns:
-        [type]: [description]
-    """
-
-    print('Getting product informations...')
-
-    # Getting the width of the scene
-    width = data.getSceneRasterWidth()
-    print('Width: {} px'.format(width))
-
-    # Getting the height of the scene
-    height = data.getSceneRasterHeight()
-    print('Height: {} px'.format(height))
-
-    # Getting the dataset name
-    name = data.getName()
-    print('Name: {}'.format(name))
-
-    # Getting the band names in the imagery
-    band_names = data.getBandNames()
-    print('Band names: {}'.format(', '.join(band_names)))
-
-    return width, height, name, band_names
-
-def Calibration(data, band, pol):
-
-    """
-    Radiometric Calibration
-
-    Args:
-        data ([type]): [description]
-        band ([type]): [description]
-        polarization (string): 'VV' or 'VH'
-
-    Returns:
-        [type]: [description]
-    """
-
-    print('Calibrating...')
+def ThermalNoiseReduction(source):
     
+    """
+    Thermal Noise Reduction Operator
+
+    Thermal noise correction can be applied to Sentinel-1 Level-1 SLC products as well as Level-1 GRD products which have not already been corrected. 
+    The operator can also remove this correction based on the product annotations (i.e. to re-introduce the noise signal that was removed). 
+    Product annotations will be updated accordingly to allow for re-application of the correction.
+
+    Args:
+    source (array) = Sentinel-1 product
+    
+    Returns:
+        Thermal Noise corrected image (array)
+    """
+
+    parameters = HashMap()
+    
+    parameters.put('selectedPolarisations', 'VH,VV')
+    parameters.put('removeThermalNoise', True)
+
+    return GPF.createProduct('c', parameters, source)
+
+def Calibration(source):
+
+    """
+    Radiometric Calibration Operator
+
+    The objective of SAR calibration is to provide imagery in which the pixel values can be directly related to the radar backscatter of the scene. 
+    Though uncalibrated SAR imagery is sufficient for qualitative use, calibrated SAR images are essential to quantitative use of SAR data.
+
+    This Operator performs different calibrations for Sentinel-1 products deriving the sigma nought images. 
+    Optionally gamma nought and beta nought images can also be created.
+
+    Args:
+    source (array) = Sentinel-1 product
+    
+    Returns:
+        Calibrated image (array)
+    """   
+
     parameters = HashMap()
 
-    parameters.put('outputSigmaBand', True) 
-    parameters.put('sourceBands', band)
-    parameters.put('selectedPolarisations', pol)
+    parameters.put('outputSigmaBand', True)
+    parameters.put('sourceBands', 'Amplitude_VH,Amplitude_VV')
+    parameters.put('selectedPolarisations', 'VH,VV')
+    parameters.put('outputImageInComplex', False) # This is for SLC products
     parameters.put('outputImageScaleInDb', False)
 
-    return GPF.createProduct('Calibration', parameters, data)
+    return GPF.createProduct('Calibration', parameters, source)
 
-# Filtragem Speckle - Speckle Filtering
-
-def SpeckleFilter(data, source_band, filter, filterSizeX, filterSizeY):
+def SpeckleFilter(source, size_x, size_y):
 
     """
-    Speckle Filtering
+    Speckle Filter Operator
+
+    SAR images have inherent salt and pepper like texturing called speckles which degrade the quality of the image and make interpretation of features more difficult. 
+    Speckles are caused by random constructive and destructive interference of the de-phased but coherent return waves scattered by the elementary scatters within each resolution cell. 
+    Speckle noise reduction can be applied either by spatial filtering or multilook processing.
+
+    Filters supported: 'Boxcar', 'Median', 'Frost', 'Gamma Map', 'Lee', 'Refined Lee', 'Lee Sigma', 'IDAN'
 
     Args:
-        data ([type]): [description]
-        source_band ([type]): [description]
-        filter (string): 'VV' or 'VH'
-        filterSizeX (int):
-        filterSizeY (int):
-
+    source (array) = Sentinel-1 product
+    
     Returns:
-        [type]: [description]
-    """
-
-    print('Aplying the Speckle Filter...')
+        Calibrated image (array)
+    """ 
 
     parameters = HashMap()
 
-    parameters.put('sourceBands', source_band)
-    parameters.put('filter', filter)
-    parameters.put('filterSizeX', '%s' % (filterSizeX))
-    parameters.put('filterSizeY', '%s' % (filterSizeY))
-    parameters.put('dampingFactor', '2')
-    parameters.put('estimateENL', 'true')
-    parameters.put('enl', '1.0')
-    parameters.put('numLooksStr', '1')
-    parameters.put('targetWindowSizeStr', '3x3')
-    parameters.put('sigmaStr', '0.9')
-    parameters.put('anSize', '50')
+    parameters.put('sourceBands', 'Sigma0_VH,Sigma0_VV')
+    parameters.put('filter', 'Refined Lee')
+    parameters.put('filterSizeX', size_x)
+    parameters.put('filterSizeY', size_y)
 
-    return GPF.createProduct('Speckle-Filter', parameters, data)
+    return GPF.createProduct('Speckle-Filter', parameters, source)
 
-def Terrain_Correction(data, source_band):
+def TerrainCorrection(source):
 
     """
-    Range Doppler Terrain Correction
+    Range Doppler Terrain Correction Operator
+
+    Due to topographical variations of a scene and the tilt of the satellite sensor, distances can be distorted in the SAR images. 
+    Image data not directly at the sensor's Nadir location will have some distortion. 
+    Terrain corrections are intended to compensate for these distortions so that the geometric representation of the image will be as close as possible to the real world.
 
     Args:
-        data ([type]): [description]
-        source_band (string): [description]
-
+    source (array) = Sentinel-1 product
+    
     Returns:
-        [type]: [description]
-    """
-
-    print('Aplying the Range Doppler Terrain Correction...')
+        Terrain corrected image (array)
+    """ 
 
     parameters = HashMap()
 
     parameters.put('demName', 'SRTM 3Sec')
     parameters.put('demResamplingMethod', 'BILINEAR_INTERPOLATION')
     parameters.put('imgResamplingMethod', 'BILINEAR_INTERPOLATION')
+    parameters.put('mapProjection', proj_3857)
     parameters.put('pixelSpacingInMeter', 10.0)
-    parameters.put('sourceBands', source_band)
+    parameters.put('sourceBands', 'Sigma0_VH,Sigma0_VV')
 
-    return GPF.createProduct('Terrain-Correction', parameters, data)
+    return GPF.createProduct('Terrain-Correction', parameters, source)
 
-def listParams(operator_name):
+def Subset(source, wkt):
 
     """
-    list the parameters of a SNAP operator
+    Subset Operator
+
+    This operator is used to create either spatial and/or spectral subsets of a data product. 
+    Spatial subset may be given by pixel positions or a geographical polygon.
 
     Args:
-        operator_name (string): [description]
-
-    Returns:
-        [type]: [description]
-    """
-
-    GPF.getDefaultInstance().getOperatorSpiRegistry().loadOperatorSpis()
+    source (array) = Sentinel-1 product
+    wkt (string) = The subset region in geographical coordinates using WKT-format.
     
-    op_spi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(operator_name)
+    Returns:
+        A scene subset image (array)
+    """ 
 
-    print('Operator name:', op_spi.getOperatorDescriptor().getName())
-    print('Operator alias:', op_spi.getOperatorDescriptor().getAlias())
+    parameters = HashMap()
 
-    param_desc = op_spi.getOperatorDescriptor().getParameterDescriptors()
+    parameters.put('geoRegion', wkt)
 
-    for param in param_desc:
-        print(param.getName(), 'or', param.getAlias())
+    return GPF.createProduct('Subset', parameters, source)
 
-if __name__ == '__main__':
+def get_georegion_wkt(roi_path):
+
+    """
+    Gets the wkt of the region of interest. This wkt is used to subset the imagery.
+
+    The roi file must be a GeoJSON file with a geographic coodinate system (ex. EPSG 4326)
+
+    Args:
+    roi_path (string) = path to the roi GeoJSON file
+    
+    Returns:
+        roi wkt (string)
+    """ 
+
+    gdf = gpd.read_file(roi_path, dtype=object)
+
+    geom = gdf.geometry.buffer(0.0002).unary_union
+    bounds = geom.bounds
+    bbox = Polygon.from_bounds(*bounds)
+    wkt = bbox.wkt
+
+    return wkt
+
+def main():
 
     # GPF Initialization
     GPF.getDefaultInstance().getOperatorSpiRegistry().loadOperatorSpis()
 
     # Product initialization
-    s1_path = 'C:/Users/jales/Desktop/S1A.zip'
+    path = r'E:/GATEC/Projeto_01/Dados/Imagens/SAR'
 
-    # Reading the data
-    product = ProductIO.readProduct(s1_path)
+    outpath = r'E:/GATEC/Projeto_01/Dados/Imagens/SAR/preprocessadas'
+
+    wkt = get_georegion_wkt('E:/GATEC/Projeto_01/Dados/Area_projeto/bbox_faz_cach_4326.GEOJSON')
+
+    if not os.path.exists(outpath):
+        os.makedirs(outpath)
+    
+    for item in os.listdir(path):
+        gc.enable()
+        gc.collect()
+
+        if item.endswith('.zip'):
+
+            date = item.split('_')[4]
+
+            product = ProductIO.readProduct(path + '/' + item)
+
+            S1_Orb = ApplyOrbitFile(product)
+
+            S1_Orb_NR = ThermalNoiseReduction(S1_Orb)
+
+            S1_Orb_NR_Cal = Calibration(S1_Orb_NR)
+
+            S1_Orb_NR_Cal_Spk = SpeckleFilter(S1_Orb_NR_Cal)
+
+            S1_Orb_NR_Cal_Spk_TC = TerrainCorrection(S1_Orb_NR_Cal_Spk)
+
+            S1_Orb_NR_Cal_Spk_TC_Sub = Subset(S1_Orb_NR_Cal_Spk_TC, wkt=wkt)
+
+            ProductIO.writeProduct(S1_Orb_NR_Cal_Spk_TC_Sub, outpath + '/' + 'S1_Orb_NR_Cal_Spk_Ter_Sub'+'_'+date+'_'+'3857', 'GeoTIFF')
+
+if __name__== "__main__":
+    main()
