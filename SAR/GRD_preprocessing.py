@@ -1,16 +1,29 @@
-from snappy import ProductIO
-from snappy import HashMap
-from snappy import GPF
+try:
+    from snappy import ProductIO
+    from snappy import HashMap
+    from snappy import GPF
+except:
+    from snappy import ProductIO
+    from snappy import HashMap
+    from snappy import GPF
 
 import geopandas as gpd
 from shapely.geometry import Polygon
 
 import os, gc
 
-# EPSG: 3857
-proj_3857 = '''PROJCS["WGS 84 / Pseudo-Mercator", GEOGCS["WGS 84", DATUM["World Geodetic System 1984", SPHEROID["WGS 84", 6378137.0, 298.257223563, AUTHORITY["EPSG","7030"]], AUTHORITY["EPSG","6326"]], PRIMEM["Greenwich", 0.0, AUTHORITY["EPSG","8901"]], UNIT["degree", 0.017453292519943295], AXIS["Geodetic longitude", EAST], AXIS["Geodetic latitude", NORTH], AUTHORITY["EPSG","4326"]], PROJECTION["Popular Visualisation Pseudo Mercator", AUTHORITY["EPSG","1024"]], PARAMETER["semi_minor", 6378137.0], PARAMETER["latitude_of_origin", 0.0], PARAMETER["central_meridian", 0.0], PARAMETER["scale_factor", 1.0], PARAMETER["false_easting", 0.0], PARAMETER["false_northing", 0.0], UNIT["m", 1.0], AXIS["Easting", EAST], AXIS["Northing", NORTH], AUTHORITY["EPSG","3857"]]'''
+import time
+from functools import wraps
 
-proj_32722 = '''PROJCS["WGS 84 / UTM zone 22S", GEOGCS["WGS 84", DATUM["World Geodetic System 1984", SPHEROID["WGS 84", 6378137.0, 298.257223563, AUTHORITY["EPSG","7030"]], AUTHORITY["EPSG","6326"]], PRIMEM["Greenwich", 0.0, AUTHORITY["EPSG","8901"]], UNIT["degree", 0.017453292519943295], AXIS["Geodetic longitude", EAST], AXIS["Geodetic latitude", NORTH], AUTHORITY["EPSG","4326"]], PROJECTION["Transverse_Mercator", AUTHORITY["EPSG","9807"]], PARAMETER["central_meridian", -51.0], PARAMETER["latitude_of_origin", 0.0], PARAMETER["scale_factor", 0.9996], PARAMETER["false_easting", 500000.0], PARAMETER["false_northing", 10000000.0], UNIT["m", 1.0], AXIS["Easting", EAST], AXIS["Northing", NORTH], AUTHORITY["EPSG","32722"]]'''
+def timing(func): # Decorator to count the processing time spent on each operator
+    @wraps(func)
+    def processing_time(*args, **kwargs):
+        t1 = time.time()
+        result = func(*args, **kwargs)
+        t2 = time.time()
+        print(f'@timing: {func.__name__} took {t2-t1} seconds')
+        return result
+    return processing_time
 
 def operator_help(operator):
 
@@ -23,7 +36,7 @@ def operator_help(operator):
     operator (string) = Operator name or alias
     
     Returns:
-        Parameter infos of a operator (array)
+        Parameter infos of a operator (text)
     """
 
     op_spi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(operator)
@@ -39,6 +52,7 @@ def operator_help(operator):
         value_set = param.getValueSet()
         print(f'Possible other values: {list(value_set)}\n')
 
+@timing
 def ApplyOrbitFile(source):
 
     """
@@ -48,10 +62,10 @@ def ApplyOrbitFile(source):
     The orbit file provides accurate satellite position and velocity information. Based on this information, the orbit state vectors in the abstract metadata of the product are updated.
 
     Args:
-    source (array) = Sentinel-1 product
+    source (product) = Sentinel-1 product object
     
     Returns:
-        Orbit corrected image (array)
+        Orbit rectified product (product)
     """
 
     parameters = HashMap()
@@ -62,6 +76,7 @@ def ApplyOrbitFile(source):
 
     return GPF.createProduct('Apply-Orbit-File', parameters, source)
 
+@timing
 def ThermalNoiseReduction(source):
     
     """
@@ -72,10 +87,10 @@ def ThermalNoiseReduction(source):
     Product annotations will be updated accordingly to allow for re-application of the correction.
 
     Args:
-    source (array) = Sentinel-1 product
+    source (prodcut) = Sentinel-1 product object
     
     Returns:
-        Thermal Noise corrected image (array)
+        Thermal Noise corrected product (product)
     """
 
     parameters = HashMap()
@@ -83,8 +98,9 @@ def ThermalNoiseReduction(source):
     parameters.put('selectedPolarisations', 'VH,VV')
     parameters.put('removeThermalNoise', True)
 
-    return GPF.createProduct('c', parameters, source)
+    return GPF.createProduct('Thermal-Noise-Reduction', parameters, source)
 
+@timing
 def Calibration(source):
 
     """
@@ -97,10 +113,10 @@ def Calibration(source):
     Optionally gamma nought and beta nought images can also be created.
 
     Args:
-    source (array) = Sentinel-1 product
+    source (product) = Sentinel-1 product object
     
     Returns:
-        Calibrated image (array)
+        Calibrated image (product)
     """   
 
     parameters = HashMap()
@@ -108,12 +124,12 @@ def Calibration(source):
     parameters.put('outputSigmaBand', True)
     parameters.put('sourceBands', 'Amplitude_VH,Amplitude_VV')
     parameters.put('selectedPolarisations', 'VH,VV')
-    parameters.put('outputImageInComplex', False) # This is for SLC products
     parameters.put('outputImageScaleInDb', False)
 
     return GPF.createProduct('Calibration', parameters, source)
 
-def SpeckleFilter(source, size_x, size_y):
+@timing
+def SpeckleFilter(source, filter, size_x=3, size_y=3):
 
     """
     Speckle Filter Operator
@@ -126,6 +142,9 @@ def SpeckleFilter(source, size_x, size_y):
 
     Args:
     source (array) = Sentinel-1 product
+    filter (string) = selected filter
+    size_x = size of the moving window in x. Default = 3
+    seize_y = size of the the moving window in y. Default = 3
     
     Returns:
         Calibrated image (array)
@@ -134,12 +153,13 @@ def SpeckleFilter(source, size_x, size_y):
     parameters = HashMap()
 
     parameters.put('sourceBands', 'Sigma0_VH,Sigma0_VV')
-    parameters.put('filter', 'Refined Lee')
+    parameters.put('filter', filter)
     parameters.put('filterSizeX', size_x)
     parameters.put('filterSizeY', size_y)
 
     return GPF.createProduct('Speckle-Filter', parameters, source)
 
+@timing
 def TerrainCorrection(source):
 
     """
@@ -161,12 +181,13 @@ def TerrainCorrection(source):
     parameters.put('demName', 'SRTM 3Sec')
     parameters.put('demResamplingMethod', 'BILINEAR_INTERPOLATION')
     parameters.put('imgResamplingMethod', 'BILINEAR_INTERPOLATION')
-    parameters.put('mapProjection', proj_3857)
+    parameters.put('mapProjection', 'EPSG:32723')
     parameters.put('pixelSpacingInMeter', 10.0)
     parameters.put('sourceBands', 'Sigma0_VH,Sigma0_VV')
 
     return GPF.createProduct('Terrain-Correction', parameters, source)
 
+@timing
 def Subset(source, wkt):
 
     """
@@ -189,6 +210,7 @@ def Subset(source, wkt):
 
     return GPF.createProduct('Subset', parameters, source)
 
+@timing
 def get_georegion_wkt(roi_path):
 
     """
@@ -212,22 +234,41 @@ def get_georegion_wkt(roi_path):
 
     return wkt
 
-def main():
+def dpsvi_preprocessing(product, roi_wkt, outpath, date):
+
+    S1_Orb = ApplyOrbitFile(product)
+
+    S1_Orb_Cal = Calibration(S1_Orb)
+
+    S1_Orb_Cal_Spk = SpeckleFilter(S1_Orb_Cal, 'Refined Lee')
+
+    S1_Orb_Cal_Spk_TC = TerrainCorrection(S1_Orb_Cal_Spk)
+
+    S1_Orb_Cal_Spk_TC_Sub = Subset(S1_Orb_Cal_Spk_TC, wkt=roi_wkt)
+
+    ProductIO.writeProduct(S1_Orb_Cal_Spk_TC_Sub, outpath + '/' + 'S1_Orb_NR_Cal_Spk_Ter_Sub'+'_'+date, 'GeoTIFF')
+
+    return print('GRD product preprocessing for DPSVI: Done')
+
+@timing
+def main(settings):
 
     # GPF Initialization
     GPF.getDefaultInstance().getOperatorSpiRegistry().loadOperatorSpis()
 
-    # Product initialization
-    path = r'E:/GATEC/Projeto_01/Dados/Imagens/SAR'
+    # Getting the roi wkt for subset
+    roi_wkt = get_georegion_wkt(settings['roi_path'])
 
-    outpath = r'E:/GATEC/Projeto_01/Dados/Imagens/SAR/preprocessadas'
-
-    wkt = get_georegion_wkt('E:/GATEC/Projeto_01/Dados/Area_projeto/bbox_faz_cach_4326.GEOJSON')
-
-    if not os.path.exists(outpath):
-        os.makedirs(outpath)
+    if not os.path.exists(settings['outpath']):
+        os.makedirs(settings['outpath'])
     
-    for item in os.listdir(path):
+    func_dict = {
+        'dpsvi': dpsvi_preprocessing
+    }
+    
+    preprocessing_method = settings['preprocessing_method']
+
+    for item in os.listdir(settings['path']):
         gc.enable()
         gc.collect()
 
@@ -235,21 +276,20 @@ def main():
 
             date = item.split('_')[4]
 
-            product = ProductIO.readProduct(path + '/' + item)
+            product = ProductIO.readProduct(settings['path'] + '/' + item)
 
-            S1_Orb = ApplyOrbitFile(product)
+            selected_func = func_dict[preprocessing_method] if preprocessing_method in func_dict else None
 
-            S1_Orb_NR = ThermalNoiseReduction(S1_Orb)
+            assert selected_func is not None, f'Unknown processing method! {preprocessing_method}'
 
-            S1_Orb_NR_Cal = Calibration(S1_Orb_NR)
-
-            S1_Orb_NR_Cal_Spk = SpeckleFilter(S1_Orb_NR_Cal)
-
-            S1_Orb_NR_Cal_Spk_TC = TerrainCorrection(S1_Orb_NR_Cal_Spk)
-
-            S1_Orb_NR_Cal_Spk_TC_Sub = Subset(S1_Orb_NR_Cal_Spk_TC, wkt=wkt)
-
-            ProductIO.writeProduct(S1_Orb_NR_Cal_Spk_TC_Sub, outpath + '/' + 'S1_Orb_NR_Cal_Spk_Ter_Sub'+'_'+date+'_'+'3857', 'GeoTIFF')
+            selected_func(product, roi_wkt, settings['outpath'], date)
 
 if __name__== "__main__":
-    main()
+
+    import json
+
+    file = open('C:/Users/jales/Documents/GitHub/thesis_code/settings.json')
+
+    params = json.load(file)
+
+    main(params)
