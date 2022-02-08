@@ -72,7 +72,7 @@ def ApplyOrbitFile(source):
 
     parameters.put('orbitType', 'Sentinel Precise (Auto Download)') # Orbit type
     parameters.put('polyDegree', '3') # Polynomial Degree
-    parameters.put('continueOnFail', 'false') # Stop the code if the orbit metadata can't be found
+    parameters.put('continueOnFail', 'true') # Stop the code if the orbit metadata can't be found
 
     return GPF.createProduct('Apply-Orbit-File', parameters, source)
 
@@ -284,7 +284,7 @@ def main(settings):
 
             selected_func(product, roi_wkt, settings['outpath'], date)
 
-if __name__== "__main__":
+if __name__ == "__main__":
 
     import json
 
