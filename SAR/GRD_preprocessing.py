@@ -4,9 +4,7 @@ Sentinel-1 GRD products preprocessing routine
 Contents:
 
 - Functions: SNAP operators
-- PRVI preproccessing
-- DpRVI preprocessing
-- Polarimetric Decomposition processing
+- DPSVI preprocessing
 '''
 
 try:
@@ -238,7 +236,7 @@ def Subset(source, wkt):
     return GPF.createProduct('Subset', parameters, source)
 
 @timing
-def get_georegion_wkt(roi_path):
+def _get_georegion_wkt(roi_path):
 
     """
     Gets the wkt of the region of interest. This wkt is used to subset the imagery.
@@ -261,7 +259,7 @@ def get_georegion_wkt(roi_path):
 
     return wkt
 
-def dpsvi_preprocessing(product, roi_wkt, outpath, date):
+def _dpsvi_preprocessing(product, roi_wkt, outpath, date):
 
     S1_Orb = ApplyOrbitFile(product)
 
@@ -284,13 +282,13 @@ def _main(settings):
     GPF.getDefaultInstance().getOperatorSpiRegistry().loadOperatorSpis()
 
     # Getting the roi wkt for subset
-    roi_wkt = get_georegion_wkt(settings['roi_path'])
+    roi_wkt = _get_georegion_wkt(settings['roi_path'])
 
     if not os.path.exists(settings['outpath']):
         os.makedirs(settings['outpath'])
     
     func_dict = {
-        'dpsvi': dpsvi_preprocessing
+        'dpsvi': _dpsvi_preprocessing
     }
     
     preprocessing_method = settings['preprocessing_method']
