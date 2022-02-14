@@ -1,16 +1,31 @@
+'''
+Sentinel-1 GRD products preprocessing routine
+
+Contents:
+
+- Functions: SNAP operators
+- PRVI preproccessing
+- DpRVI preprocessing
+- Polarimetric Decomposition processing
+'''
+
 try:
     from snappy import ProductIO
     from snappy import HashMap
     from snappy import GPF
+    from snappy import jpy
 except:
     from snappy import ProductIO
     from snappy import HashMap
     from snappy import GPF
+    from snappy import jpy
 
 import geopandas as gpd
 from shapely.geometry import Polygon
 
-import os, gc
+import os
+from pathlib import Path
+import argparse
 
 import time
 from functools import wraps
@@ -24,6 +39,18 @@ def timing(func): # Decorator to count the processing time spent on each operato
         print(f'@timing: {func.__name__} took {t2-t1} seconds')
         return result
     return processing_time
+    
+def _get_args():
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-j', '--json',
+    help='The input json file cotaining the preprocessing settings',
+    type=str)
+
+    args = parser.parse_args()
+
+    return args
 
 def operator_help(operator):
 
@@ -251,7 +278,7 @@ def dpsvi_preprocessing(product, roi_wkt, outpath, date):
     return print('GRD product preprocessing for DPSVI: Done')
 
 @timing
-def main(settings):
+def _main(settings):
 
     # GPF Initialization
     GPF.getDefaultInstance().getOperatorSpiRegistry().loadOperatorSpis()
@@ -268,9 +295,9 @@ def main(settings):
     
     preprocessing_method = settings['preprocessing_method']
 
+    System = jpy.get_type('java.lang.System')
+
     for item in os.listdir(settings['path']):
-        gc.enable()
-        gc.collect()
 
         if item.endswith('.zip'):
 
@@ -284,12 +311,22 @@ def main(settings):
 
             selected_func(product, roi_wkt, settings['outpath'], date)
 
+            product.dispose()
+            System.gc()
+
 if __name__ == "__main__":
 
     import json
 
-    file = open('C:/Users/jales/Documents/GitHub/thesis_code/settings.json')
+    args = _get_args()
+
+    file = open(args.json)
 
     params = json.load(file)
 
-    main(params)
+    _main(params)
+
+    cache_path = params['cache_path']
+
+    for p in Path(cache_path).glob("*.tmp"):
+        os.remove(p)
