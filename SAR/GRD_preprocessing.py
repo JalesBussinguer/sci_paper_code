@@ -18,12 +18,11 @@ except:
     from snappy import GPF
     from snappy import jpy
 
-import geopandas as gpd
-from shapely.geometry import Polygon
-
 import os
-from pathlib import Path
 import argparse
+import geopandas as gpd
+from pathlib import Path
+from shapely.geometry import Polygon
 
 import time
 from functools import wraps
