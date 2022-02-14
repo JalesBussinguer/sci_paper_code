@@ -362,7 +362,7 @@ def TerrainCorrection(source):
     parameters.put('demName', 'SRTM 3Sec')
     parameters.put('demResamplingMethod', 'BILINEAR_INTERPOLATION')
     parameters.put('imgResamplingMethod', 'BILINEAR_INTERPOLATION')
-    parameters.put('mapProjection', proj_3857)
+    parameters.put('mapProjection', 'EPSG:32723')
     parameters.put('pixelSpacingInMeter', 10.0)
 
     return GPF.createProduct('Terrain-Correction', parameters, source)
@@ -510,7 +510,7 @@ def dprvi_preprocessing(product, roi_wkt, outpath, file, date, roi_path):
 
     S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_DpRVI_TC = TerrainCorrection(S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_DpRVI)
 
-    ProductIO.writeProduct(S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_DpRVI_TC, outpath + '/' + 'S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_DpRVI_TC'+'_'+date+'_'+'3857', 'GeoTIFF')
+    ProductIO.writeProduct(S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_DpRVI_TC, outpath + '/' + 'S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_DpRVI_TC'+'_'+date+'_'+'32723', 'GeoTIFF')
 
     return print('SLC preprocessing for DpRVI: Done')
 
