@@ -127,7 +127,7 @@ def conv2d(matrix, window):
 
 # GRD indices
 @timing
-def rvi_grd_index(VV, VH):
+def rvi_grd_index(vv, vh):
 
     """
     RVI - Radar Vegetation Index (Dual Polarization)
@@ -140,12 +140,12 @@ def rvi_grd_index(VV, VH):
         RVI (array) 
     """
 
-    rvi = (4 * VH) / (VV + VH)
+    rvi = (4 * vv) / (vv + vh)
 
     return rvi.astype(np.float32)
 
 @timing
-def dpsvi_index(VV, VH):
+def dpsvi_index(vv, vh):
 
     """
     DPSVI - Dual Polarization SAR Vegetation Index
@@ -160,29 +160,32 @@ def dpsvi_index(VV, VH):
         DPSVI (array)
     """
 
-    VV_max = VV.max() # Maybe use a solver to determine this number
+    VV_max = 0.25
+    
+    # np.nanmax(vv) # Maybe use a solver to determine this number
 
-    dpsvi = (VH * (VV_max * VV - VV * VH + np.power(VH, 2) + VV_max * VV - np.power(VV, 2) + VH * VV)) / (np.sqrt(2) * VV)
+    dpsvi = vh * (VV_max * vh - vv * vh + np.power(vh, 2) + VV_max * vv - np.power(vv, 2) + vh * vv) / (1.4142 * vv)
 
     return dpsvi.astype(np.float32)
 
 @timing
-def dpsvim_index(VV, VH):
+def dpsvim_index(vv, vh):
 
     """
     DPSVIm - Modified Dual-Pol SAR Vegetation Index
 
     Args:
-    VV (array) = Vertical-Vertical polarization
+
+    VV (array) = Vertical-Vertical polarization \n
     VH (array) = Vertical-Horizontal polarization
     
     Returns:
         DPSVIm (array)
     """
     
-    dpsvim = ((VV * VV) + (VV * VH)) / np.sqrt(2)
+    dpsvim = (np.power(vv, 2) + (vv * vh)) / (1.4142)
 
-    return dpsvim.astype(np.float32)
+    return dpsvim.astype(np.float32) * 10
 
 # SLC indices    
 @timing
@@ -225,16 +228,16 @@ def dprvi_index(c11, c12_real, c12_imag, c22, window_size):
     c2_det = (c11s * c22s - c12s * c21s)
     c2_trace = c11s + c22s
 
-    dop = (np.sqrt(1.0 - (4.0 * c2_det / np.power(c2_trace, 2))))
+    dop = (np.sqrt(1.0 - ((4.0 * c2_det) / np.power(c2_trace, 2))))
 
-    sqdiscr = np.sqrt(np.absolute(c2_trace * c2_trace - 4 * c2_det))
+    sqdiscr = np.sqrt(np.absolute(np.power(c2_trace, 2) - 4 * c2_det))
 
     lambda1 = (c2_trace + sqdiscr) * 0.5
     lambda2 = (c2_trace - sqdiscr) * 0.5
 
-    beta = lambda1 / (lambda1 + lambda2)
+    beta = np.abs(lambda1 / (lambda1 + lambda2))
 
-    dprvi = 1 - (dop * beta)
+    dprvi = np.abs(1 - (dop * beta))
 
     return dprvi.astype(np.float32)
 
@@ -278,33 +281,33 @@ def prvi_index(c11, c12_real, c12_imag, c22, window_size):
     c2_det = (c11s * c22s) - (c12s * c21s)
     c2_trace = c11s + c22s
 
-    dop = (np.sqrt(1.0 - (4.0 * c2_det / np.power(c2_trace, 2))))
+    dop = (np.sqrt(1.0 - ((4.0 * c2_det) / np.power(c2_trace, 2))))
 
-    prvi = (1 - dop) * c22s
+    prvi = np.abs((1 - dop) * c22s)
 
-    return prvi.astype(np.float32)
+    return prvi.astype(np.float32) * 10
 
-@timing
-def rvi_slc_index(c11, c22, window_size):
+# @timing
+# def rvi_slc_index(c11, c22, window_size):
 
-    kernel = np.ones((window_size, window_size), np.float32) / (window_size * window_size)
+#     kernel = np.ones((window_size, window_size), np.float32) / (window_size * window_size)
 
-    c11_T1 = c11
-    c22_T1 = c22
+#     c11_T1 = c11
+#     c22_T1 = c22
 
-    c11_T1r = conv2d(np.real(c11_T1), kernel)
-    c11_T1i = conv2d(np.imag(c11_T1), kernel)
-    c11s = c11_T1r + 1j * c11_T1i
+#     c11_T1r = conv2d(np.real(c11_T1), kernel)
+#     c11_T1i = conv2d(np.imag(c11_T1), kernel)
+#     c11s = c11_T1r + 1j * c11_T1i
 
-    c22_T1r = conv2d(np.real(c22_T1), kernel)
-    c22_T1i = conv2d(np.imag(c22_T1), kernel)
-    c22s = c22_T1r + 1j * c22_T1i
+#     c22_T1r = conv2d(np.real(c22_T1), kernel)
+#     c22_T1i = conv2d(np.imag(c22_T1), kernel)
+#     c22s = c22_T1r + 1j * c22_T1i
     
-    c2_trace = c11s + c22s
+#     c2_trace = c11s + c22s
 
-    rvi = (4 * c22s) / c2_trace
+#     rvi = (4 * c22s) / c2_trace
 
-    return rvi.astype(np.float32)
+#     return rvi.astype(np.float32)
 
 @timing
 def _main(settings):
@@ -313,7 +316,7 @@ def _main(settings):
 
     geometries = [geom for geom in roi.geometry]
 
-    # optical image
+    # Optical image
     with rst.open(settings['optical_image']) as opt:
         
         opt_image, opt_transform = mask(opt, geometries, crop=True, nodata=np.nan)
@@ -368,9 +371,6 @@ def _main(settings):
     # PRVI
     prvi = prvi_index(c11, c12_real, c12_imag, c22, window_size=3)
     indices_list.append(prvi)
-    # RVI_SLC
-    rvi_slc = rvi_slc_index(c11, c22, window_size=3)
-    indices_list.append(rvi_slc)
     # DPSVI
     dpsvi = dpsvi_index(vv, vh)
     indices_list.append(dpsvi)
