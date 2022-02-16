@@ -1,6 +1,6 @@
 {
-    "path": "D:/thesis_data/RAW/SLC",
-    "outpath": "D:/thesis_data/preprocessed/SLC_test",
+    "path": "D:/thesis_data/RAW/slc_problems",
+    "outpath": "D:/thesis_data/preprocessed/SLC",
     "roi_path": "D:/thesis_data/ROI/ROI_PNB_4326.geojson",
     "preprocessing_method": "dprvi",
     "cache_path": "C:/Users/jales/.snap/var/cache/temp"
