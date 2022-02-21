@@ -466,7 +466,7 @@ def pol_decomposition(product, roi_wkt, outpath, file, date, roi_path):
 
     S1_split_Orb_Deb_Sub_Mul_Spk_Decomp_Ter = TerrainCorrection(S1_split_Orb_Deb_Sub_Mul_Spk_Decomp)
 
-    ProductIO.writeProduct(S1_split_Orb_Deb_Sub_Mul_Spk_Decomp_Ter, outpath + '/' + 'S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_Decomp_TC' + '_' + date + '_' + '3857', 'GeoTIFF')
+    ProductIO.writeProduct(S1_split_Orb_Deb_Sub_Mul_Spk_Decomp_Ter, outpath + '/' + 'S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_Decomp_TC' + '_' + date + '_' + '32723', 'GeoTIFF')
 
     return print('Polarimetric Decomposition: Done')
 
@@ -534,17 +534,17 @@ def prvi_preprocessing(product, roi_wkt, outpath, file, date, roi_path):
 
     S1_split_Orb_Deb_Merge = TopsarMerge(products) if len(products) > 1 else products[0]
 
-    S1_split_Orb_Cal_Deb_Sub = Subset(S1_split_Orb_Deb_Merge, wkt=roi_wkt)
+    S1_split_Orb_Cal_Deb_Mul = Multilooking(S1_split_Orb_Deb_Merge)
 
-    S1_split_Orb_Cal_Deb_Sub_Mul = Multilooking(S1_split_Orb_Cal_Deb_Sub)
+    S1_split_Orb_Cal_Deb_Mul_C2 = C2_Matrix(S1_split_Orb_Cal_Deb_Mul)
 
-    S1_split_Orb_Cal_Deb_Sub_Mul_C2 = C2_Matrix(S1_split_Orb_Cal_Deb_Sub_Mul)
+    S1_split_Orb_Cal_Deb_Mul_C2_Spk = PolarimetricSpeckleFilter(S1_split_Orb_Cal_Deb_Mul_C2, 'Refined Lee Filter')
 
-    S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk = PolarimetricSpeckleFilter(S1_split_Orb_Cal_Deb_Sub_Mul_C2, 'Refined Lee Filter')
+    S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC = TerrainCorrection(S1_split_Orb_Cal_Deb_Mul_C2_Spk)
 
-    S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_TC = TerrainCorrection(S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk)
+    S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC_Sub = Subset(S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC, wkt=roi_wkt)
 
-    ProductIO.writeProduct(S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_TC, outpath + '/' + 'S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_TC'+'_'+date+'_'+'3857', 'GeoTIFF')
+    ProductIO.writeProduct(S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC_Sub, outpath + '/' + 'S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC_Sub'+'_'+date+'_'+'32723', 'GeoTIFF')
 
     return print('SLC preprocessing for PRVI: Done')
 
