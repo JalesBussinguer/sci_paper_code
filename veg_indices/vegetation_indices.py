@@ -333,8 +333,8 @@ def _main(settings):
 
         grd_image, grd_transform = mask(grd, geometries, crop=True, nodata=np.nan)
 
-        vv = grd_image[0]
-        vh = grd_image[1]
+        vh = grd_image[0]
+        vv = grd_image[1]
     
     # SAR SLC image
     with rst.open(settings['slc_image']) as slc:
