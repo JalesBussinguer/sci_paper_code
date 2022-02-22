@@ -321,12 +321,11 @@ def _main(settings):
         
         opt_image, opt_transform = mask(opt, geometries, crop=True, nodata=np.nan)
         
-        swir = opt_image[0]
+        swir1 = opt_image[0]
         nir = opt_image[1]
-        redge = opt_image[2]
+        redge2 = opt_image[2]
         red = opt_image[3]
-        green = opt_image[4]
-        blue = opt_image[5]
+        blue = opt_image[4]
 
     # SAR GRD image
     with rst.open(settings['grd_image']) as grd:
@@ -354,10 +353,10 @@ def _main(settings):
     ndvi = ndvi_index(nir, red)
     indices_list.append(ndvi)
     # NDWI
-    ndwi = ndwi_index(nir, swir)
+    ndwi = ndwi_index(nir, swir1)
     indices_list.append(ndwi)
     # PSRI
-    psri = psri_index(red, blue, redge)
+    psri = psri_index(red, blue, redge2)
     indices_list.append(psri)
     # EVI
     evi = evi_index(nir, red, blue)
@@ -392,8 +391,8 @@ def _main(settings):
                     })
 
     with rst.open(settings['indices_outpath'], "w", **out_meta) as dest:
-        for id, indice in enumerate(indices_list):
-            dest.write_band(indice, id)
+        for id, indice in enumerate(indices_list, start=1):
+            dest.write(indice, id)
 
 if __name__ == "__main__":
 
