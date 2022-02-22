@@ -10,6 +10,10 @@ from functools import wraps
 
 def _get_args():
 
+    '''
+    Input parameters parser
+    '''
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-j', '--json',
@@ -106,7 +110,6 @@ def evi_index(nir, red, blue):
     return evi.astype(np.float32)
 
 # Tools
-
 def conv2d(matrix, window):
 
     # Convolution operator
@@ -160,7 +163,7 @@ def dpsvi_index(vv, vh):
         DPSVI (array)
     """
 
-    VV_max = 0.25
+    VV_max = np.nanmax(vv)
     
     # np.nanmax(vv) # Maybe use a solver to determine this number
 
@@ -185,7 +188,25 @@ def dpsvim_index(vv, vh):
     
     dpsvim = (np.power(vv, 2) + (vv * vh)) / (1.4142)
 
-    return dpsvim.astype(np.float32) * 10
+    return dpsvim.astype(np.float32)
+
+@timing
+def dprvic_index(vh, vv):
+
+    q = vh/vv
+
+    dprvic = (q * (q + 3)) / np.power((q + 1), 2)
+
+    return dprvic.astype(np.float32)
+
+@ timing
+def rvic_index(vh, vv):
+
+    q = vh/vv
+
+    rvic = (4 * q) / (1 + q)
+
+    return rvic.astype(np.float32)
 
 # SLC indices    
 @timing
@@ -235,9 +256,9 @@ def dprvi_index(c11, c12_real, c12_imag, c22, window_size):
     lambda1 = (c2_trace + sqdiscr) * 0.5
     lambda2 = (c2_trace - sqdiscr) * 0.5
 
-    beta = np.abs(lambda1 / (lambda1 + lambda2))
+    beta = lambda1 / (lambda1 + lambda2)
 
-    dprvi = np.abs(1 - (dop * beta))
+    dprvi = 1 - (dop * beta)
 
     return dprvi.astype(np.float32)
 
@@ -283,9 +304,9 @@ def prvi_index(c11, c12_real, c12_imag, c22, window_size):
 
     dop = (np.sqrt(1.0 - ((4.0 * c2_det) / np.power(c2_trace, 2))))
 
-    prvi = np.abs((1 - dop) * c22s)
+    prvi = (1 - dop) * c22s
 
-    return prvi.astype(np.float32) * 10
+    return prvi.astype(np.float32)
 
 # @timing
 # def rvi_slc_index(c11, c22, window_size):
@@ -348,7 +369,6 @@ def _main(settings):
     indices_list = []
     
     # Multispectral vegetation indices
-
     # NDVI
     ndvi = ndvi_index(nir, red)
     indices_list.append(ndvi)
@@ -363,12 +383,11 @@ def _main(settings):
     indices_list.append(evi)
     
     # SAR vegetation indices
-
     # DpRVI
-    dprvi = dprvi_index(c11, c12_real, c12_imag, c22, window_size=3)
+    dprvi = dprvi_index(c11, c12_real, c12_imag, c22, window_size=1)
     indices_list.append(dprvi)
     # PRVI
-    prvi = prvi_index(c11, c12_real, c12_imag, c22, window_size=3)
+    prvi = prvi_index(c11, c12_real, c12_imag, c22, window_size=1)
     indices_list.append(prvi)
     # DPSVI
     dpsvi = dpsvi_index(vv, vh)
@@ -379,6 +398,12 @@ def _main(settings):
     # RVI_GRD
     rvi_grd = rvi_grd_index(vv, vh)
     indices_list.append(rvi_grd)
+    # DpRVIc
+    dprvic = dprvic_index(vh, vv)
+    indices_list.append(dprvic)
+    # RVIc
+    rvic = rvic_index(vh, vv)
+    indices_list.append(rvic)
 
     out_meta = opt.meta
 
