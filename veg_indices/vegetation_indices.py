@@ -372,23 +372,23 @@ def _main(settings):
     # NDVI
     ndvi = ndvi_index(nir, red)
     indices_list.append(ndvi)
-    # NDWI
-    ndwi = ndwi_index(nir, swir1)
-    indices_list.append(ndwi)
-    # PSRI
-    psri = psri_index(red, blue, redge2)
-    indices_list.append(psri)
-    # EVI
-    evi = evi_index(nir, red, blue)
-    indices_list.append(evi)
+    # # NDWI
+    # ndwi = ndwi_index(nir, swir1)
+    # indices_list.append(ndwi)
+    # # PSRI
+    # psri = psri_index(red, blue, redge2)
+    # indices_list.append(psri)
+    # # EVI
+    # evi = evi_index(nir, red, blue)
+    # indices_list.append(evi)
     
-    # SAR vegetation indices
-    # DpRVI
-    dprvi = dprvi_index(c11, c12_real, c12_imag, c22, window_size=1)
-    indices_list.append(dprvi)
-    # PRVI
-    prvi = prvi_index(c11, c12_real, c12_imag, c22, window_size=1)
-    indices_list.append(prvi)
+    # # SAR vegetation indices
+    # # DpRVI
+    # dprvi = dprvi_index(c11, c12_real, c12_imag, c22, window_size=1)
+    # indices_list.append(dprvi)
+    # # PRVI
+    # prvi = prvi_index(c11, c12_real, c12_imag, c22, window_size=1)
+    # indices_list.append(prvi)
     # DPSVI
     dpsvi = dpsvi_index(vv, vh)
     indices_list.append(dpsvi)
@@ -398,13 +398,7 @@ def _main(settings):
     # RVI_GRD
     rvi_grd = rvi_grd_index(vv, vh)
     indices_list.append(rvi_grd)
-    # DpRVIc
-    dprvic = dprvic_index(vh, vv)
-    indices_list.append(dprvic)
-    # RVIc
-    rvic = rvic_index(vh, vv)
-    indices_list.append(rvic)
-
+    
     out_meta = opt.meta
 
     out_meta.update({
