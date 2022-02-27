@@ -1,6 +1,6 @@
 {
     "path": "D:/thesis_data/SAR/RAW/SLC/2021",
-    "outpath": "D:/thesis_data/preprocessed/SLC",
+    "outpath": "D:/thesis_data/SAR/preprocessed/SLC",
     "roi_path": "D:/thesis_data/ROI/ROI_PNB_4326.GEOJSON",
     "preprocessing_method": "prvi",
     "cache_path": "C:/Users/jales/.snap/var/cache/temp"
