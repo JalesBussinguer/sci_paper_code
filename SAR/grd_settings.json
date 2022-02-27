@@ -1,6 +1,7 @@
 {
-    "path": "D:/thesis_data/SAR/RAW/GRD",
-    "outpath": "D:/thesis_data/SAR/preprocessed/GRD",
+    "path": "E:/thesis_data/RAW/GRD/2021",
+    "outpath": "D:/thesis_data/SAR/preprocessed/GRD/2021",
     "roi_path": "D:/thesis_data/ROI/ROI_PNB_4326.geojson",
-    "preprocessing_method": "dpsvi"
+    "preprocessing_method": "dpsvi",
+    "cache_path": "C:/Users/jales/.snap/var/cache/temp"
 }

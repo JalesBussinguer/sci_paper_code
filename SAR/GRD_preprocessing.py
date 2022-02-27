@@ -270,7 +270,7 @@ def _dpsvi_preprocessing(product, roi_wkt, outpath, date):
 
     S1_Orb_Cal_Spk_TC_Sub = Subset(S1_Orb_Cal_Spk_TC, wkt=roi_wkt)
 
-    ProductIO.writeProduct(S1_Orb_Cal_Spk_TC_Sub, outpath + '/' + 'S1_Orb_Cal_Spk_Ter_Sub'+'_'+date, 'GeoTIFF')
+    ProductIO.writeProduct(S1_Orb_Cal_Spk_TC_Sub, outpath + '/' + 'S0'+'_'+date+'_32723', 'GeoTIFF')
 
     return print('GRD product preprocessing for DPSVI: Done')
 
