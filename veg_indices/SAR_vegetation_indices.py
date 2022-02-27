@@ -224,18 +224,18 @@ def _main(settings):
 
     geometries = [geom for geom in roi.geometry]
 
-    indices_list = []
+    for i, _ in enumerate(os.listdir(settings['slc_image'])):
 
-    for item in os.listdir(settings['slc_image']):
+        indices_list = []
 
-        if item.endswith('.tif'):
+        slc_image = os.listdir(settings['slc_image'])[i]
 
-            date = item.split('_')[2]
+        if slc_image.endswith('.tif'):
 
-            file = settings['slc_image'] + '/' + item
+            slc_file = settings['slc_image'] + '/' + slc_image
 
             # SAR SLC image
-            with rst.open(file) as slc:
+            with rst.open(slc_file) as slc:
 
                 slc_image, slc_transform = mask(slc, geometries, crop=True, nodata=np.nan)
 
@@ -243,60 +243,56 @@ def _main(settings):
                 c12_real = slc_image[1]
                 c12_imag = slc_image[2]
                 c22 = slc_image[3]
-    
-            # DpRVI
-            dprvi = dprvi_index(c11, c12_real, c12_imag, c22, window_size=1)
-            indices_list.append(dprvi)
+        
+        grd_image = os.listdir(settings['grd_image'])[i]
 
-            # PRVI
-            prvi = prvi_index(c11, c12_real, c12_imag, c22, window_size=1)
-            indices_list.append(prvi)
+        if grd_image.endswith('.tif'):
 
-    for item in os.listdir(settings['grd_image']):
+            date = grd_image.split('_')[1]
 
-        if item.endswith('.tif'):
-
-            date = item.split('_')[2]
-
-            file = settings['grd_image'] + '/' + item
+            grd_file = settings['grd_image'] + '/' + grd_image
 
             # SAR GRD image
-            with rst.open(file) as grd:
+            with rst.open(grd_file) as grd:
 
                 grd_image, grd_transform = mask(grd, geometries, crop=True, nodata=np.nan)
 
                 vh = grd_image[0]
                 vv = grd_image[1]
+    
+        # DpRVI
+        dprvi = dprvi_index(c11, c12_real, c12_imag, c22, window_size=1)
+        indices_list.append(dprvi)
+
+        # PRVI
+        prvi = prvi_index(c11, c12_real, c12_imag, c22, window_size=1)
+        indices_list.append(prvi)
             
-            # DPSVI
-            dpsvi = dpsvi_index(vv, vh)
-            indices_list.append(dpsvi)
+        # DPSVI
+        dpsvi = dpsvi_index(vv, vh)
+        indices_list.append(dpsvi)
 
-            # DPSVIm
-            dpsvim = dpsvim_index(vv, vh)
-            indices_list.append(dpsvim)
+        # DPSVIm
+        dpsvim = dpsvim_index(vv, vh)
+        indices_list.append(dpsvim)
 
-            # RVI_GRD
-            rvi_grd = rvi_grd_index(vv, vh)
-            indices_list.append(rvi_grd)
+        # RVI_GRD
+        rvi_grd = rvi_grd_index(vv, vh)
+        indices_list.append(rvi_grd)
     
-    func_list = ['DpRVI', 'PRVI', 'DPSVI', 'DPSVIm', 'RVI']
-    
-    out_meta = slc.meta
+        out_meta = slc.meta
 
-    out_meta.update({
-                    "driver": "GTiff",
-                    "height": dprvi.shape[0],
-                    "width": dprvi.shape[1],
-                    "transform": slc_transform,
-                    "count": len(indices_list)
-                    })
+        out_meta.update({
+                        "driver": "GTiff",
+                        "height": dpsvi.shape[0],
+                        "width": dpsvi.shape[1],
+                        "transform": slc_transform,
+                        "count": len(indices_list)
+                        })
 
-    with rst.open(settings['indices_outpath'] + '/' + date + '_' + '32723', "w", **out_meta) as dest:
-        for id, indice in enumerate(indices_list, start=1):
-            dest.write(indice, id)
-            for func in func_list:
-                dest.set_band_description(id, func)
+        with rst.open(settings['indices_outpath'] + '/' + date + '.tif', "w", **out_meta) as dest:
+            for id, indice in enumerate(indices_list, start=1):
+                dest.write(indice, id)
 
 if __name__ == "__main__":
 
