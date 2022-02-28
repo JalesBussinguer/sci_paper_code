@@ -1,5 +1,5 @@
 {
-    "path": "D:/thesis_data/SAR/RAW/SLC/2021",
+    "path": "D:/thesis_data/SAR/RAW/SLC/2021/20210819",
     "outpath": "D:/thesis_data/SAR/preprocessed/SLC",
     "roi_path": "D:/thesis_data/ROI/ROI_PNB_4326.GEOJSON",
     "preprocessing_method": "prvi",

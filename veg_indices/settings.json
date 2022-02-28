@@ -4,5 +4,5 @@
     "optical_image": "D:/thesis_data/OPT/2021",
     "grd_image": "D:/thesis_data/SAR/preprocessed/GRD/2021",
     "slc_image": "D:/thesis_data/SAR/preprocessed/SLC/2021",
-    "indices_outpath": "D:/thesis_data/VEG_INDICES"
+    "indices_outpath": "D:/thesis_data/VEG_INDICES/2021"
 }

@@ -293,6 +293,8 @@ def _main(settings):
         with rst.open(settings['indices_outpath'] + '/' + date + '.tif', "w", **out_meta) as dest:
             for id, indice in enumerate(indices_list, start=1):
                 dest.write(indice, id)
+        
+        print(f'{date} indices processed!')
 
 if __name__ == "__main__":
 
