@@ -9,7 +9,7 @@ form_florestal = gpd.read_file('D:/thesis_data/ROI/classes/form_florestal_10m_32
 form_savanica = gpd.read_file('D:/thesis_data/ROI/classes/form_savanica_10m_32723.GEOJSON')
 form_campestre = gpd.read_file('D:/thesis_data/ROI/classes/form_campestre_10m_32723.GEOJSON')
 
-indices_path = os.listdir('D:/thesis_data/VEG_INDICES/2021/')
+indices_path = os.listdir('D:/thesis_data/VEG_INDICES/raster/')
 
 indices_list = ['DpRVI', 'PRVI', 'DPSVI', 'DPSVIm', 'RVI']
 
@@ -23,7 +23,7 @@ for id, indice in enumerate(indices_list, start=1):
 
         date = indices_path[index].split('.')[0]
 
-        florestal = zonal_stats(form_florestal, 'D:/thesis_data/VEG_INDICES/2021/' + image, band=id, nodata=np.nan, stats=['median', 'mean', 'std'])
+        florestal = zonal_stats(form_florestal, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['median', 'mean', 'std'])
 
         florestal_stats = pd.DataFrame(florestal)
         florestal_stats['date'] = date
@@ -39,7 +39,7 @@ for id, indice in enumerate(indices_list, start=1):
 
         date = indices_path[index].split('.')[0]
 
-        savanica = zonal_stats(form_savanica, 'D:/thesis_data/VEG_INDICES/2021/' + image, band=id, nodata=np.nan, stats=['median', 'mean', 'std'])
+        savanica = zonal_stats(form_savanica, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['median', 'mean', 'std'])
 
         savanica_stats = pd.DataFrame(savanica)
         savanica_stats['date'] = date
@@ -55,7 +55,7 @@ for id, indice in enumerate(indices_list, start=1):
 
         date = indices_path[index].split('.')[0]
 
-        campestre = zonal_stats(form_campestre, 'D:/thesis_data/VEG_INDICES/2021/' + image, band=id, nodata=np.nan, stats=['median', 'mean', 'std'])
+        campestre = zonal_stats(form_campestre, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['median', 'mean', 'std'])
 
         campestre_stats = pd.DataFrame(campestre)
         campestre_stats['date'] = date

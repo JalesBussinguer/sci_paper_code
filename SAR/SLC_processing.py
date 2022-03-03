@@ -544,7 +544,7 @@ def prvi_preprocessing(product, roi_wkt, outpath, file, date, roi_path):
 
     S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC_Sub = Subset(S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC, wkt=roi_wkt)
 
-    ProductIO.writeProduct(S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC_Sub, outpath + '/' + 'S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC_Sub'+'_'+date+'_'+'32723', 'GeoTIFF')
+    ProductIO.writeProduct(S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC_Sub, outpath + '/' + 'C2'+'_'+date+'_'+'32723', 'GeoTIFF')
 
     return print('SLC preprocessing for PRVI: Done')
 

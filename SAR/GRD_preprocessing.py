@@ -251,7 +251,7 @@ def _get_georegion_wkt(roi_path):
 
     gdf = gpd.read_file(roi_path, dtype=object)
 
-    geom = gdf.geometry.buffer(0.0002).unary_union
+    geom = gdf.geometry.buffer(0.02).unary_union
     bounds = geom.bounds
     bbox = Polygon.from_bounds(*bounds)
     wkt = bbox.wkt

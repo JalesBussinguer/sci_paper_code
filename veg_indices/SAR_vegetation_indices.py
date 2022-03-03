@@ -249,7 +249,6 @@ def _main(settings):
         if grd_image.endswith('.tif'):
 
             date = grd_image.split('_')[1]
-
             grd_file = settings['grd_image'] + '/' + grd_image
 
             # SAR GRD image
