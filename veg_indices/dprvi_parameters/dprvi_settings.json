@@ -1,0 +1,5 @@
+{
+    "roi_path": "D:/thesis_data/ROI/PNB_32723.GEOJSON",
+    "slc_image": "D:/thesis_data/SAR/preprocessed/SLC",
+    "indices_outpath": "D:/thesis_data/VEG_INDICES/dprvi_parameters/"
+}
