@@ -47,11 +47,11 @@ for id, indice in enumerate(indices_list, start=1):
 
         print(f'{indice} - {date} campestre data collected!')
         
-    df_florestal_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/test/' + 'florestal' + indice + '.csv', sep=',')
+    df_florestal_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/test/' + 'florestal' + indice + '.csv', sep=',', index=False)
     print(f'{indice} florestal csv file saved!')
 
-    df_savanica_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/test/'+ 'savanica' + indice + '.csv', sep=',')
+    df_savanica_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/test/'+ 'savanica' + indice + '.csv', sep=',', index=False)
     print(f'{indice} savanica csv file saved!')
 
-    df_campestre_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/test/'+ 'campestre' + indice + '.csv', sep=',')
+    df_campestre_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/test/'+ 'campestre' + indice + '.csv', sep=',', index=False)
     print(f'{indice} campestre csv file saved!')
