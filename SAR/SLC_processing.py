@@ -158,7 +158,7 @@ def ApplyOrbitFile(source):
     return GPF.createProduct('Apply-Orbit-File', parameters, source)
 
 @timing
-def Calibration(source, complex=False):
+def Calibration(source):
 
     """
     Radiometric Calibration Operator
@@ -180,8 +180,8 @@ def Calibration(source, complex=False):
     parameters = HashMap()
 
     parameters.put('selectedPolarisations', 'VH,VV')
-    parameters.put('outputImageInComplex', complex) # This is for SLC products
-    parameters.put('outputImageScaleInDb', False)
+    parameters.put('outputImageInComplex', 'true')
+    parameters.put('outputImageScaleInDb', 'false')
 
     return GPF.createProduct('Calibration', parameters, source)
 
@@ -256,6 +256,8 @@ def Multilooking(source):
 
     parameters.put('nRgLooks', 4)
     parameters.put('nAzLooks', 1)
+    parameters.put('outputIntensity', 'false')
+    parameters.put('grSquarePixel', 'true')
 
     return GPF.createProduct('Multilook', parameters, source)
 
@@ -294,7 +296,7 @@ def PolarimetricSpeckleFilter(source, filter, window_size='5x5'):
 
     Number of Looks supported: '1', '2', '3', '4'
 
-    Window sizes supported: '5x5', '7x7', '9x9', '11x11', '13x13', '15x15', '17x17' 
+    Window sizes supported: '5x5', '7x7', '9x9', '11x11', '13x13', '15x15', '17x17'
 
     Args:
     source (product) = Sentinel-1 product object
@@ -307,7 +309,6 @@ def PolarimetricSpeckleFilter(source, filter, window_size='5x5'):
 
     parameters = HashMap()
 
-    parameters.put('sourceBands', 'Sigma0_VH,Sigma0_VV')
     parameters.put('filter', filter)
     parameters.put('numLooksStr', '1')
     parameters.put('windowSize', window_size)
@@ -315,7 +316,7 @@ def PolarimetricSpeckleFilter(source, filter, window_size='5x5'):
     return GPF.createProduct('Polarimetric-Speckle-Filter', parameters, source)
 
 @timing
-def PolarimetricDecomposition(source, window_size=3):
+def PolarimetricDecomposition(source, window_size='3'):
 
     """
     Polarimetric Decomposition Operator
@@ -485,7 +486,7 @@ def dprvi_preprocessing(product, roi_wkt, outpath, file, date, roi_path):
 
         S1_split_Orb = ApplyOrbitFile(S1_split)
 
-        S1_split_Orb_Cal = Calibration(S1_split_Orb, complex='true')
+        S1_split_Orb_Cal = Calibration(S1_split_Orb)
 
         S1_split_Orb_Cal_Deb = TopsarDeburst(S1_split_Orb_Cal)
 
@@ -524,7 +525,7 @@ def prvi_preprocessing(product, roi_wkt, outpath, file, date, roi_path):
 
         S1_split_Orb = ApplyOrbitFile(S1_split)
 
-        S1_split_Orb_Cal = Calibration(S1_split_Orb, complex='true')
+        S1_split_Orb_Cal = Calibration(S1_split_Orb)
 
         S1_split_Orb_Cal_Deb = TopsarDeburst(S1_split_Orb_Cal)
 

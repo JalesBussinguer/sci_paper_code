@@ -160,7 +160,7 @@ def dprvi_index(c11, c12_real, c12_imag, c22, window_size):
 
     dop = (np.sqrt(1.0 - ((4.0 * c2_det) / np.power(c2_trace, 2))))
 
-    sqdiscr = np.sqrt(np.absolute(np.power(c2_trace, 2) - 4 * c2_det))
+    sqdiscr = np.sqrt(np.power(c2_trace, 2) - 4 * c2_det)
 
     lambda1 = (c2_trace + sqdiscr) * 0.5
     lambda2 = (c2_trace - sqdiscr) * 0.5
