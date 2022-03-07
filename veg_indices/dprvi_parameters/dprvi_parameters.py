@@ -83,8 +83,8 @@ def dprvi_index(c11, c12_real, c12_imag, c22, window_size):
     c21s = np.conjugate(c12s)
     c22s = np.real(c22_r) + 1j * np.imag(c22_r)
 
-    c2_det = (c11s * c22s - c12s * c21s)
-    c2_trace = c11s + c22s
+    c2_det = c11s * c22s - c12s * c21s
+    c2_trace = -(c11s + c22s)
 
     dop = (np.sqrt(1.0 - ((4.0 * c2_det) / np.power(c2_trace, 2))))
 
@@ -184,7 +184,7 @@ def beta_op(c11, c12_real, c12_imag, c22, window_size):
     c21s = np.conjugate(c12s)
     c22s = np.real(c22_r) + 1j * np.imag(c22_r)
 
-    c2_det = (c11s * c22s - c12s * c21s)
+    c2_det = c11s * c22s - c12s * c21s
     c2_trace = c11s + c22s
 
     sqdiscr = np.sqrt(np.power(c2_trace, 2) - 4 * c2_det)
