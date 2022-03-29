@@ -205,7 +205,7 @@ def TerrainCorrection(source):
     parameters.put('demName', 'SRTM 3Sec')
     parameters.put('demResamplingMethod', 'BILINEAR_INTERPOLATION')
     parameters.put('imgResamplingMethod', 'BILINEAR_INTERPOLATION')
-    parameters.put('mapProjection', 'EPSG:32723')
+    parameters.put('mapProjection', 'EPSG:32722')
     parameters.put('pixelSpacingInMeter', 10.0)
     parameters.put('sourceBands', 'Sigma0_VH,Sigma0_VV')
 
@@ -251,7 +251,7 @@ def _get_georegion_wkt(roi_path):
 
     gdf = gpd.read_file(roi_path, dtype=object)
 
-    geom = gdf.geometry.buffer(0.02).unary_union
+    geom = gdf.geometry.buffer(0.002).unary_union
     bounds = geom.bounds
     bbox = Polygon.from_bounds(*bounds)
     wkt = bbox.wkt
@@ -268,9 +268,9 @@ def _dpsvi_preprocessing(product, roi_wkt, outpath, date):
 
     S1_Orb_Cal_Spk_TC = TerrainCorrection(S1_Orb_Cal_Spk)
 
-    S1_Orb_Cal_Spk_TC_Sub = Subset(S1_Orb_Cal_Spk_TC, wkt=roi_wkt)
+    S1_Orb_Cal_Spk_Sub = Subset(S1_Orb_Cal_Spk_TC, wkt=roi_wkt)
 
-    ProductIO.writeProduct(S1_Orb_Cal_Spk_TC_Sub, outpath + '/' + 'S0'+'_'+date+'_32723', 'GeoTIFF')
+    ProductIO.writeProduct(S1_Orb_Cal_Spk_Sub, outpath + '/' + 'S0'+'_'+date+'_32722', 'GeoTIFF')
 
     return print('GRD product preprocessing for DPSVI: Done')
 
