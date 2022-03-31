@@ -1,6 +1,6 @@
 {
-    "path": "C:/Users/jales/Desktop/paper_01/raw",
-    "outpath": "C:/Users/jales/Desktop/paper_01/preprocessed",
+    "path": "C:/Users/jales/Desktop/paper_01/raw/asc",
+    "outpath": "C:/Users/jales/Desktop/paper_01/preprocessed/asc",
     "roi_path": "C:/Users/jales/Desktop/paper_01/roi/polygons_01_extension_4326.geojson",
     "preprocessing_method": "dpsvi",
     "cache_path": "C:/Users/jales/.snap/var/cache/temp"
