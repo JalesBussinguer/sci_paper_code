@@ -5,9 +5,9 @@ import os
 
 from rasterstats import zonal_stats
 
-form_florestal = gpd.read_file('D:/thesis_data/ROI/classes/form_florestal_10m_32723.GEOJSON')
-form_savanica = gpd.read_file('D:/thesis_data/ROI/classes/form_savanica_10m_32723.GEOJSON')
-form_campestre = gpd.read_file('D:/thesis_data/ROI/classes/form_campestre_10m_32723.GEOJSON')
+form_florestal = gpd.read_file('D:/thesis_data/ROI/sampling/form_florestal_32723_buffer.GEOJSON')
+form_savanica = gpd.read_file('D:/thesis_data/ROI/sampling/form_savanica_32723_buffer.GEOJSON')
+form_campestre = gpd.read_file('D:/thesis_data/ROI/sampling/form_campestre_32723_buffer.GEOJSON')
 
 indices_path = os.listdir('D:/thesis_data/VEG_INDICES/raster/')
 
@@ -47,11 +47,11 @@ for id, indice in enumerate(indices_list, start=1):
 
         print(f'{indice} - {date} campestre data collected!')
         
-    df_florestal_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/test/' + 'florestal' + indice + '.csv', sep=',', index=False)
+    df_florestal_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/' + 'florestal' + indice + '.csv', sep=',', index=False)
     print(f'{indice} florestal csv file saved!')
 
-    df_savanica_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/test/'+ 'savanica' + indice + '.csv', sep=',', index=False)
+    df_savanica_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/'+ 'savanica' + indice + '.csv', sep=',', index=False)
     print(f'{indice} savanica csv file saved!')
 
-    df_campestre_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/test/'+ 'campestre' + indice + '.csv', sep=',', index=False)
+    df_campestre_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/'+ 'campestre' + indice + '.csv', sep=',', index=False)
     print(f'{indice} campestre csv file saved!')
