@@ -7,20 +7,14 @@ import os
 
 # from rasterstats import point_query
 
-form_florestal = gpd.read_file('D:/thesis_data/ROI/classes/form_florestal_10m_32723.GEOJSON')
+form_florestal = gpd.read_file('D:/thesis_data/ROI/sampling/form_florestal_32723_buffer.GEOJSON')
 florestal_geom = [geom for geom in form_florestal.geometry]
 
-florestal_geom = florestal_geom.geometry.buffer(-0.02).unary_union
-
-form_savanica = gpd.read_file('D:/thesis_data/ROI/classes/form_savanica_10m_32723.GEOJSON')
+form_savanica = gpd.read_file('D:/thesis_data/ROI/sampling/form_savanica_32723_buffer.GEOJSON')
 savanica_geom = [geom for geom in form_savanica.geometry]
 
-savanica_geom = savanica_geom.geometry.buffer(-0.02).unary_union
-
-form_campestre = gpd.read_file('D:/thesis_data/ROI/classes/form_campestre_10m_32723.GEOJSON')
+form_campestre = gpd.read_file('D:/thesis_data/ROI/sampling/form_campestre_32723_buffer.GEOJSON')
 campestre_geom = [geom for geom in form_campestre.geometry]
-
-campestre_geom = campestre_geom.geometry.buffer(-0.02).unary_union
 
 indices_path = os.listdir('D:/thesis_data/VEG_INDICES/raster')
 
