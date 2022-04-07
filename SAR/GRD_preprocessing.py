@@ -5,6 +5,8 @@ Contents:
 
 - Functions: SNAP operators
 - DPSVI preprocessing
+
+Desenvolvido por: Jales de Freitas Bussinguer (UnB)
 '''
 
 try:
