@@ -23,7 +23,7 @@ for id, indice in enumerate(indices_list, start=1):
 
         date = indices_path[index].split('T')[0]
 
-        florestal = zonal_stats(form_florestal, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['median', 'mean', 'std'])
+        florestal = zonal_stats(form_florestal, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['median', 'percentile_25', 'percentile_75', 'std'])
 
         florestal_stats = pd.DataFrame(florestal)
         florestal_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')
@@ -31,7 +31,7 @@ for id, indice in enumerate(indices_list, start=1):
 
         print(f'{indice} - {date} florestal data collected')
 
-        savanica = zonal_stats(form_savanica, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['median', 'mean', 'std'])
+        savanica = zonal_stats(form_savanica, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['median', 'percentile_25', 'percentile_75', 'std'])
 
         savanica_stats = pd.DataFrame(savanica)
         savanica_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')
@@ -39,7 +39,7 @@ for id, indice in enumerate(indices_list, start=1):
 
         print(f'{indice} - {date} savanica data collected!')
 
-        campestre = zonal_stats(form_campestre, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['median', 'mean', 'std'])
+        campestre = zonal_stats(form_campestre, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['median', 'percentile_25', 'percentile_75', 'std'])
 
         campestre_stats = pd.DataFrame(campestre)
         campestre_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')
@@ -47,11 +47,11 @@ for id, indice in enumerate(indices_list, start=1):
 
         print(f'{indice} - {date} campestre data collected!')
         
-    df_florestal_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/' + 'florestal' + indice + '.csv', sep=',', index=False)
+    df_florestal_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/base/' + 'florestal' + indice + '.csv', sep=',', index=False)
     print(f'{indice} florestal csv file saved!')
 
-    df_savanica_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/'+ 'savanica' + indice + '.csv', sep=',', index=False)
+    df_savanica_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/base/'+ 'savanica' + indice + '.csv', sep=',', index=False)
     print(f'{indice} savanica csv file saved!')
 
-    df_campestre_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/'+ 'campestre' + indice + '.csv', sep=',', index=False)
+    df_campestre_stats.to_csv('D:/thesis_data/VEG_INDICES/stats/base/'+ 'campestre' + indice + '.csv', sep=',', index=False)
     print(f'{indice} campestre csv file saved!')
