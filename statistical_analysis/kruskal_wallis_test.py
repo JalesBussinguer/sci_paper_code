@@ -1,8 +1,6 @@
-import numpy as np
+from scipy.stats import kruskal as kw_test
 import pandas as pd
 import os
-
-from scipy.stats import kruskal as kw_test
 
 florestal_path = 'D:/thesis_data/VEG_INDICES/samples/florestal/'
 savanica_path = 'D:/thesis_data/VEG_INDICES/samples/savanica/'
