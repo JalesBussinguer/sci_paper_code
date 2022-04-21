@@ -1,7 +1,7 @@
 {
-    "path": "D:/thesis_data/SAR/RAW/SLC/2019_re",
-    "outpath": "D:/thesis_data/SAR/preprocessed/SLC",
+    "path": "E:/thesis_data/RAW/SLC/2018/",
+    "outpath": "F:/thesis_data",
     "roi_path": "D:/thesis_data/ROI/ROI_PNB_4326.GEOJSON",
-    "preprocessing_method": "prvi",
+    "preprocessing_method": "pol_decomposition",
     "cache_path": "C:/Users/jales/.snap/var/cache/temp/"
 }
