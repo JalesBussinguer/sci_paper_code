@@ -7,13 +7,13 @@ import os
 
 # from rasterstats import point_query
 
-form_florestal = gpd.read_file('D:/thesis_data/ROI/sampling/FF_50_sampling_grids_10m_32723.GEOJSON')
+form_florestal = gpd.read_file('D:/thesis_data/ROI/sampling/FF_50_sampling_grids_20m_32723.GEOJSON')
 florestal_geom = [geom for geom in form_florestal.geometry]
 
-form_savanica = gpd.read_file('D:/thesis_data/ROI/sampling/FS_50_sampling_grids_10m_32723.GEOJSON')
+form_savanica = gpd.read_file('D:/thesis_data/ROI/sampling/FS_50_sampling_grids_20m_32723.GEOJSON')
 savanica_geom = [geom for geom in form_savanica.geometry]
 
-form_campestre = gpd.read_file('D:/thesis_data/ROI/sampling/FC_50_sampling_grids_10m_32723.GEOJSON')
+form_campestre = gpd.read_file('D:/thesis_data/ROI/sampling/FC_50_sampling_grids_20m_32723.GEOJSON')
 campestre_geom = [geom for geom in form_campestre.geometry]
 
 indices_path = os.listdir('D:/thesis_data/VEG_INDICES/raster')
@@ -51,7 +51,7 @@ for index, image in enumerate(indices_path):
         # df_ff_dpsvim.dropna(inplace=True)
         # df_ff_rvi.dropna(inplace=True)
 
-    df_ff.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/florestal/' + 'FF_' + date + '_patches' + '.csv', sep=',', index=False)
+    df_ff.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/florestal/20m/' + 'FF_' + date + '_20m_patches' + '.csv', sep=',', index=False)
     # df_ff_prvi.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/' + 'PRVI_ff_' + date + '_patches' + '.csv', sep=',', index=False)
     # df_ff_dpsvi.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/' + 'DPSVI_ff_' + date + '_patches' + '.csv', sep=',', index=False)
     # df_ff_dpsvim.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/' + 'DPSVIm_ff_' + date + '_patches' + '.csv', sep=',', index=False)
@@ -92,7 +92,7 @@ for index, image in enumerate(indices_path):
         # df_ff_dpsvim.dropna(inplace=True)
         # df_ff_rvi.dropna(inplace=True)
 
-    df_fs.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/savanica/' + 'FS_' + date + '_patches' + '.csv', sep=',', index=False)
+    df_fs.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/savanica/20m/' + 'FS_' + date + '_20m_patches' + '.csv', sep=',', index=False)
     # df_ff_prvi.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/' + 'PRVI_ff_' + date + '_patches' + '.csv', sep=',', index=False)
     # df_ff_dpsvi.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/' + 'DPSVI_ff_' + date + '_patches' + '.csv', sep=',', index=False)
     # df_ff_dpsvim.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/' + 'DPSVIm_ff_' + date + '_patches' + '.csv', sep=',', index=False)
@@ -133,7 +133,7 @@ for index, image in enumerate(indices_path):
         # df_ff_dpsvim.dropna(inplace=True)
         # df_ff_rvi.dropna(inplace=True)
 
-    df_fc.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/campestre/' + 'FC_' + date + '_patches' + '.csv', sep=',', index=False)
+    df_fc.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/campestre/20m/' + 'FC_' + date + '_20m_patches' + '.csv', sep=',', index=False)
     # df_ff_prvi.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/' + 'PRVI_ff_' + date + '_patches' + '.csv', sep=',', index=False)
     # df_ff_dpsvi.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/' + 'DPSVI_ff_' + date + '_patches' + '.csv', sep=',', index=False)
     # df_ff_dpsvim.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/' + 'DPSVIm_ff_' + date + '_patches' + '.csv', sep=',', index=False)
