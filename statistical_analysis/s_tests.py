@@ -64,7 +64,7 @@ def lognorm_s_test(scale_p, scale_q, shape_p, shape_q, m, n, significance_level=
     """
 
     # Scipy parametrization: scale = exp(mu) and shape = sigma
-    
+
     mu_p = log(scale_p)
     mu_q = log(scale_q)
     sigma_p = shape_p
@@ -79,6 +79,7 @@ def lognorm_s_test(scale_p, scale_q, shape_p, shape_q, m, n, significance_level=
 
     if p_value <= significance_level:
         result = 1 # Reject H0
+        
     if p_value >= significance_level:
         result = 0 # Accept H0
     
