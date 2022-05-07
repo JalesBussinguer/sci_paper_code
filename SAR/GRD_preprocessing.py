@@ -207,7 +207,7 @@ def TerrainCorrection(source):
     parameters.put('demName', 'SRTM 3Sec')
     parameters.put('demResamplingMethod', 'BILINEAR_INTERPOLATION')
     parameters.put('imgResamplingMethod', 'BILINEAR_INTERPOLATION')
-    parameters.put('mapProjection', 'EPSG:32722')
+    parameters.put('mapProjection', 'EPSG:32723')
     parameters.put('pixelSpacingInMeter', 10.0)
     parameters.put('sourceBands', 'Sigma0_VH,Sigma0_VV')
 
@@ -272,7 +272,7 @@ def _dpsvi_preprocessing(product, roi_wkt, outpath, date):
 
     S1_Orb_Cal_Spk_Sub = Subset(S1_Orb_Cal_Spk_TC, wkt=roi_wkt)
 
-    ProductIO.writeProduct(S1_Orb_Cal_Spk_Sub, outpath + '/' + 'S0'+'_'+date+'_32722', 'GeoTIFF')
+    ProductIO.writeProduct(S1_Orb_Cal_Spk_Sub, outpath + '/' + 'S0'+'_'+date+'_32723', 'GeoTIFF')
 
     return print('GRD product preprocessing for DPSVI: Done')
 
