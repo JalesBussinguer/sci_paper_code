@@ -67,11 +67,11 @@ def lognorm_s_test(scale_p, scale_q, shape_p, shape_q, m, n, significance_level=
 
     mu_p = log(scale_p)
     mu_q = log(scale_q)
-    sigma_p = shape_p
-    sigma_q = shape_q
+    var_p = np.power(shape_p, 2)
+    var_q = np.power(shape_q, 2)
 
     # Kullback-Leibler distances (simmetrized)
-    dskl_ln = (np.power(mu_p - mu_q, 2)) / (2 * np.power(sigma_p, 2) * np.power(sigma_q, 2))
+    dskl_ln = (var_p * np.power((mu_p - mu_q), 2) + var_q * np.power((mu_q - mu_p), 2) + np.power((var_p - var_q), 2)) / (2 * var_p * var_q)
 
     s = ((2*m*n) / (m + n)) * dskl_ln # statistic
 
