@@ -9,7 +9,7 @@ form_florestal = gpd.read_file('D:/thesis_data/ROI/sampling/form_florestal_32723
 form_savanica = gpd.read_file('D:/thesis_data/ROI/sampling/form_savanica_32723_buffer.GEOJSON')
 form_campestre = gpd.read_file('D:/thesis_data/ROI/sampling/form_campestre_32723_buffer.GEOJSON')
 
-indices_path = os.listdir('D:/thesis_data/VEG_INDICES/raster/')
+indices_path = os.listdir('D:/thesis_data/VEG_INDICES/samples/stratified/florestal/20m/')
 
 indices_list = ['DpRVI', 'PRVI', 'DPSVI', 'DPSVIm', 'RVI']
 
