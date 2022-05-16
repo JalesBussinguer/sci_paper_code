@@ -89,13 +89,23 @@ def lognorm_s_test(scale_p, scale_q, shape_p, shape_q, m, n, significance_level=
 
 if __name__ == '__main__':
 
-    dataset = 1
+    import os
 
-    df = pd.read_csv(dataset)
+    file_path = 'D:/thesis_data/VEG_INDICES/lognorm_params/florestal/'
 
-    for i in len(df.index):
-        for j in len(df.index):
-            
-            lognorm_s_test(i, j)
+    for file in os.listdir(file_path):
 
-            # Record the result of the s test in a Mij matrix
+        df = pd.read_csv(file_path + file)
+
+        for i in df.index:
+            for j in df.index:
+
+                scale_p = df.prvi_scale[i]
+                scale_q = df.prvi_scale[j]
+
+                shape_p = np.power(df.prvi_shape[i], 2)
+                shape_q = np.power(df.prvi_shape[j], 2)
+                
+                lognorm_s_test(i, j, m=400, n=400)
+
+                # Record the result of the s test in a Mij matrix
