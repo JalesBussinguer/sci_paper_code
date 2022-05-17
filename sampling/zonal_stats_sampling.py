@@ -5,9 +5,9 @@ import os
 
 from rasterstats import zonal_stats
 
-form_florestal = gpd.read_file('D:/thesis_data/ROI/classes/form_florestal_30m_32723.GEOJSON')
-form_savanica = gpd.read_file('D:/thesis_data/ROI/classes/form_savanica_30m_32723.GEOJSON')
-form_campestre = gpd.read_file('D:/thesis_data/ROI/classes/form_campestre_30m_32723.GEOJSON')
+form_florestal = gpd.read_file('D:/thesis_data/ROI/classes/form_florestal_30m_32723_buffer.GEOJSON')
+form_savanica = gpd.read_file('D:/thesis_data/ROI/classes/form_savanica_30m_32723_buffer.GEOJSON')
+form_campestre = gpd.read_file('D:/thesis_data/ROI/classes/form_campestre_30m_32723_buffer.GEOJSON')
 
 images_path = 'D:/thesis_data/VEG_INDICES/raster/'
 image_list = os.listdir(images_path)
