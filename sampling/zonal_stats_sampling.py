@@ -5,11 +5,12 @@ import os
 
 from rasterstats import zonal_stats
 
-form_florestal = gpd.read_file('D:/thesis_data/ROI/sampling/form_florestal_32723_buffer.GEOJSON')
-form_savanica = gpd.read_file('D:/thesis_data/ROI/sampling/form_savanica_32723_buffer.GEOJSON')
-form_campestre = gpd.read_file('D:/thesis_data/ROI/sampling/form_campestre_32723_buffer.GEOJSON')
+form_florestal = gpd.read_file('D:/thesis_data/ROI/classes/form_florestal_30m_32723.GEOJSON')
+form_savanica = gpd.read_file('D:/thesis_data/ROI/classes/form_savanica_30m_32723.GEOJSON')
+form_campestre = gpd.read_file('D:/thesis_data/ROI/classes/form_campestre_30m_32723.GEOJSON')
 
-indices_path = os.listdir('D:/thesis_data/VEG_INDICES/samples/stratified/florestal/20m/')
+images_path = 'D:/thesis_data/VEG_INDICES/raster/'
+image_list = os.listdir(images_path)
 
 indices_list = ['DpRVI', 'PRVI', 'DPSVI', 'DPSVIm', 'RVI']
 
@@ -19,9 +20,9 @@ for id, indice in enumerate(indices_list, start=1):
     df_savanica_stats = pd.DataFrame()
     df_campestre_stats = pd.DataFrame()
 
-    for index, image in enumerate(indices_path):
+    for index, image in enumerate(image_list):
 
-        date = indices_path[index].split('T')[0]
+        date = image_list[index].split('T')[0]
 
         florestal = zonal_stats(form_florestal, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['mean', 'median', 'percentile_25', 'percentile_75', 'std'])
 
@@ -31,7 +32,7 @@ for id, indice in enumerate(indices_list, start=1):
 
         print(f'{indice} - {date} florestal data collected')
 
-        savanica = zonal_stats(form_savanica, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['mean','median', 'percentile_25', 'percentile_75', 'std'])
+        savanica = zonal_stats(form_savanica, images_path + image, band=id, nodata=np.nan, stats=['mean','median', 'percentile_25', 'percentile_75', 'std'])
 
         savanica_stats = pd.DataFrame(savanica)
         savanica_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')
@@ -39,7 +40,7 @@ for id, indice in enumerate(indices_list, start=1):
 
         print(f'{indice} - {date} savanica data collected!')
 
-        campestre = zonal_stats(form_campestre, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['mean','median', 'percentile_25', 'percentile_75', 'std'])
+        campestre = zonal_stats(form_campestre, images_path + image, band=id, nodata=np.nan, stats=['mean','median', 'percentile_25', 'percentile_75', 'std'])
 
         campestre_stats = pd.DataFrame(campestre)
         campestre_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')
