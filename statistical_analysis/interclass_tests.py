@@ -56,8 +56,18 @@ for id, _ in enumerate(os.listdir(class1_path)):
                 if p_value > 0.05:
                     matrix[i, j] = 0
         
-        rate = matrix.sum() / (len(class1_df.index) * len(class1_df.index))
+        m = matrix.shape[0]
+        idx = (np.arange(1, m+1) + (m+1) * np.arange(m - 1)[:, None]).reshape(m, -1)
+        out = matrix.ravel()[idx]
+
+        rate = (out.sum() / (out.shape[0] * out.shape[1]))
     
         data[index].append(rate)
+
+    print(id)
         
 result = pd.DataFrame(data)
+
+output_path = 'D:/thesis_data/VEG_INDICES/rates/'
+
+result.to_csv(output_path + 'FS_FC_rates.csv', sep=',', index=False)

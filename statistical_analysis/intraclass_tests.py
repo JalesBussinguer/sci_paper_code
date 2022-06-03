@@ -57,9 +57,15 @@ for file in os.listdir(file_path):
                 if p_value > 0.05:
                     matrix[i, j] = 0
         
-        rate = matrix.sum() / (len(df.index) * len(df.index))
+        m = matrix.shape[0]
+        idx = (np.arange(1, m+1) + (m+1) * np.arange(m - 1)[:, None]).reshape(m, -1)
+        out = matrix.ravel()[idx]
+
+        rate = (out.sum() / (out.shape[0]*out.shape[1]))
     
         data[index].append(rate)
+
+    print(file)
         
 result = pd.DataFrame(data)
 
