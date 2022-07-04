@@ -24,7 +24,7 @@ for id, indice in enumerate(indices_list, start=1):
 
         date = image_list[index].split('T')[0]
 
-        florestal = zonal_stats(form_florestal, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['mean', 'median', 'percentile_25', 'percentile_75', 'std'])
+        florestal = zonal_stats(form_florestal, 'D:/thesis_data/VEG_INDICES/raster/' + image, band=id, nodata=np.nan, stats=['median', 'percentile_25', 'percentile_75', 'std'])
 
         florestal_stats = pd.DataFrame(florestal)
         florestal_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')

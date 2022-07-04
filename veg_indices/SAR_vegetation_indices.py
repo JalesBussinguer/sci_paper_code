@@ -254,7 +254,7 @@ def _main(settings):
             # SAR GRD image
             with rst.open(grd_file) as grd:
 
-                grd_image, grd_transform = mask(grd, geometries, crop=True, nodata=np.nan)
+                grd_image, _ = mask(grd, geometries, crop=True, nodata=np.nan)
 
                 vh = grd_image[0]
                 vv = grd_image[1]
