@@ -226,23 +226,23 @@ def _main(settings):
                 c22 = slc_image[3]
     
         # DpRVI
-        dprvi = dprvi_index(c11, c12_real, c12_imag, c22, window_size=7)
+        dprvi = dprvi_index(c11, c12_real, c12_imag, c22, window_size=5)
         indices_list.append(dprvi)
 
         # DOP
-        dop = dop_op(c11, c12_real, c12_imag, c22, window_size=7)
+        dop = dop_op(c11, c12_real, c12_imag, c22, window_size=5)
         indices_list.append(dop)
 
         # Lambda 1
-        lambda1 = lambda1_op(c11, c12_real, c12_imag, c22, window_size=7)
+        lambda1 = lambda1_op(c11, c12_real, c12_imag, c22, window_size=5)
         indices_list.append(lambda1)
 
         # Lambda 2
-        lambda2 = lambda2_op(c11, c12_real, c12_imag, c22, window_size=7)
+        lambda2 = lambda2_op(c11, c12_real, c12_imag, c22, window_size=5)
         indices_list.append(lambda2)
 
         # Beta
-        beta = beta_op(c11, c12_real, c12_imag, c22, window_size=7)
+        beta = beta_op(c11, c12_real, c12_imag, c22, window_size=5 )
         indices_list.append(beta)
 
         out_meta = slc.meta
