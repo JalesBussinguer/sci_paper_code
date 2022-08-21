@@ -14,7 +14,7 @@ image_list = os.listdir(images_path)
 
 indices_list = ['DpRVI', 'PRVI', 'DPSVI', 'DPSVIm', 'RVI']
 
-pol_list = ['entropy', 'alpha_angle']
+pol_list = ['entropy', 'anisotopy', 'alpha_angle']
 
 for id, indice in enumerate(pol_list, start=1):
 
@@ -26,7 +26,7 @@ for id, indice in enumerate(pol_list, start=1):
 
         date = image_list[index].split('_')[11].split('T')[0]
 
-        florestal = zonal_stats(form_florestal, images_path + image, band=id, nodata=np.nan, stats=['median', 'percentile_25', 'percentile_75', 'std'])
+        florestal = zonal_stats(form_florestal, images_path + image, band=id, nodata=np.nan, stats=['mean', 'median', 'percentile_25', 'percentile_75', 'std'])
 
         florestal_stats = pd.DataFrame(florestal)
         florestal_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')
@@ -34,7 +34,7 @@ for id, indice in enumerate(pol_list, start=1):
 
         print(f'{indice} - {date} florestal data collected')
 
-        savanica = zonal_stats(form_savanica, images_path + image, band=id, nodata=np.nan, stats=['median', 'percentile_25', 'percentile_75', 'std'])
+        savanica = zonal_stats(form_savanica, images_path + image, band=id, nodata=np.nan, stats=['mean', 'median', 'percentile_25', 'percentile_75', 'std'])
 
         savanica_stats = pd.DataFrame(savanica)
         savanica_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')
@@ -42,7 +42,7 @@ for id, indice in enumerate(pol_list, start=1):
 
         print(f'{indice} - {date} savanica data collected!')
 
-        campestre = zonal_stats(form_campestre, images_path + image, band=id, nodata=np.nan, stats=['median', 'percentile_25', 'percentile_75', 'std'])
+        campestre = zonal_stats(form_campestre, images_path + image, band=id, nodata=np.nan, stats=['mean', 'median', 'percentile_25', 'percentile_75', 'std'])
 
         campestre_stats = pd.DataFrame(campestre)
         campestre_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')
@@ -52,15 +52,15 @@ for id, indice in enumerate(pol_list, start=1):
     
     df_florestal_stats = df_florestal_stats.reindex(index=df_florestal_stats.index[::-1])
     df_florestal_stats.reset_index(inplace=True, drop=True)
-    df_florestal_stats.to_csv('D:/thesis_data/POL_DECOMP/stats/' + 'florestal' + indice + '.csv', sep=',', index=False)
+    df_florestal_stats.to_csv('D:/thesis_data/POL_DECOMP/stats/' + 'florestal_' + indice + '.csv', sep=',', index=False)
     print(f'{indice} florestal csv file saved!')
 
     df_savanica_stats = df_savanica_stats.reindex(index=df_savanica_stats.index[::-1])
     df_savanica_stats.reset_index(inplace=True, drop=True)
-    df_savanica_stats.to_csv('D:/thesis_data/POL_DECOMP/stats/' + 'savanica' + indice + '.csv', sep=',', index=False)
+    df_savanica_stats.to_csv('D:/thesis_data/POL_DECOMP/stats/' + 'savanica_' + indice + '.csv', sep=',', index=False)
     print(f'{indice} savanica csv file saved!')
 
     df_campestre_stats = df_campestre_stats.reindex(index=df_campestre_stats.index[::-1])
     df_campestre_stats.reset_index(inplace=True, drop=True)
-    df_campestre_stats.to_csv('D:/thesis_data/POL_DECOMP/stats/' + 'campestre' + indice + '.csv', sep=',', index=False)
+    df_campestre_stats.to_csv('D:/thesis_data/POL_DECOMP/stats/' + 'campestre_' + indice + '.csv', sep=',', index=False)
     print(f'{indice} campestre csv file saved!')
