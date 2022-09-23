@@ -73,20 +73,31 @@ def dprvi_index(c11, c12_real, c12_imag, c22, window_size):
 
     kernel = np.ones((window_size, window_size), np.float32) / (window_size * window_size)
 
-    c11_r = conv2d(c11, kernel)
-    c12_r = conv2d(c12_real, kernel)
-    c12_i = conv2d(c12_imag, kernel)
-    c22_r = conv2d(c22, kernel)
+    c11_T1 = c11
+    c12_T1 = c12_real + 1j * c12_imag
+    c21_T1 = np.conjugate(c12_T1)
+    c22_T1 = c22
 
-    c11s = np.real(c11_r) + 1j * np.imag(c11_r)
-    c12s = c12_r + 1j * c12_i
-    c21s = np.conjugate(c12s)
-    c22s = np.real(c22_r) + 1j * np.imag(c22_r)
+    c11_T1r = conv2d(np.real(c11_T1), kernel)
+    c11_T1i = conv2d(np.imag(c11_T1), kernel)
+    c11s = c11_T1r + 1j * c11_T1i
 
-    c2_det = c11s * c22s - c12s * c21s
-    c2_trace = -(c11s + c22s)
+    c12_T1r = conv2d(np.real(c12_T1), kernel)
+    c12_T1i = conv2d(np.imag(c12_T1), kernel)
+    c12s = c12_T1r + 1j * c12_T1i
+    
+    c21_T1r = conv2d(np.real(c21_T1), kernel)
+    c21_T1i = conv2d(np.imag(c21_T1), kernel)
+    c21s = c21_T1r + 1j * c21_T1i
 
-    dop = (np.sqrt(1.0 - ((4.0 * c2_det) / np.power(c2_trace, 2))))
+    c22_T1r = conv2d(np.real(c22_T1), kernel)
+    c22_T1i = conv2d(np.imag(c22_T1), kernel)
+    c22s = c22_T1r + 1j * c22_T1i
+
+    c2_det = (c11s * c22s - c12s * c21s)
+    c2_trace = c11s + c22s
+
+    dop = (np.sqrt(1.0 - (4.0 * c2_det / np.power(c2_trace, 2))))
 
     sqdiscr = np.sqrt(np.power(c2_trace, 2) - 4 * c2_det)
 
@@ -97,104 +108,7 @@ def dprvi_index(c11, c12_real, c12_imag, c22, window_size):
 
     dprvi = 1 - (dop * beta)
 
-    return dprvi.astype(np.float32)
-
-@timing
-def dop_op(c11, c12_real, c12_imag, c22, window_size):
-
-    kernel = np.ones((window_size, window_size), np.float32) / (window_size * window_size)
-
-    c11_r = conv2d(c11, kernel)
-    c12_r = conv2d(c12_real, kernel)
-    c12_i = conv2d(c12_imag, kernel)
-    c22_r = conv2d(c22, kernel)
-
-    c11s = np.real(c11_r) + 1j * np.imag(c11_r)
-    c12s = c12_r + 1j * c12_i
-    c21s = np.conjugate(c12s)
-    c22s = np.real(c22_r) + 1j * np.imag(c22_r)
-
-    c2_det = (c11s * c22s - c12s * c21s)
-    c2_trace = c11s + c22s
-
-    dop = (np.sqrt(1.0 - ((4.0 * c2_det) / np.power(c2_trace, 2))))
-
-    return dop.astype(np.float32)
-
-@timing
-def lambda1_op(c11, c12_real, c12_imag, c22, window_size):
-
-    kernel = np.ones((window_size, window_size), np.float32) / (window_size * window_size)
-
-    c11_r = conv2d(c11, kernel)
-    c12_r = conv2d(c12_real, kernel)
-    c12_i = conv2d(c12_imag, kernel)
-    c22_r = conv2d(c22, kernel)
-
-    c11s = np.real(c11_r) + 1j * np.imag(c11_r)
-    c12s = c12_r + 1j * c12_i
-    c21s = np.conjugate(c12s)
-    c22s = np.real(c22_r) + 1j * np.imag(c22_r)
-
-    c2_det = (c11s * c22s - c12s * c21s)
-    c2_trace = c11s + c22s
-
-    sqdiscr = np.sqrt(np.power(c2_trace, 2) - 4 * c2_det)
-
-    lambda1 = (c2_trace + sqdiscr) * 0.5
-
-    return lambda1.astype(np.float32)
-
-@timing
-def lambda2_op(c11, c12_real, c12_imag, c22, window_size):
-
-    kernel = np.ones((window_size, window_size), np.float32) / (window_size * window_size)
-
-    c11_r = conv2d(c11, kernel)
-    c12_r = conv2d(c12_real, kernel)
-    c12_i = conv2d(c12_imag, kernel)
-    c22_r = conv2d(c22, kernel)
-
-    c11s = np.real(c11_r) + 1j * np.imag(c11_r)
-    c12s = c12_r + 1j * c12_i
-    c21s = np.conjugate(c12s)
-    c22s = np.real(c22_r) + 1j * np.imag(c22_r)
-
-    c2_det = (c11s * c22s - c12s * c21s)
-    c2_trace = c11s + c22s
-
-    sqdiscr = np.sqrt(np.power(c2_trace, 2) - 4 * c2_det)
-
-    lambda2 = (c2_trace - sqdiscr) * 0.5
-
-    return lambda2.astype(np.float32)
-
-@timing
-def beta_op(c11, c12_real, c12_imag, c22, window_size):
-
-    kernel = np.ones((window_size, window_size), np.float32) / (window_size * window_size)
-
-    c11_r = conv2d(c11, kernel)
-    c12_r = conv2d(c12_real, kernel)
-    c12_i = conv2d(c12_imag, kernel)
-    c22_r = conv2d(c22, kernel)
-
-    c11s = np.real(c11_r) + 1j * np.imag(c11_r)
-    c12s = c12_r + 1j * c12_i
-    c21s = np.conjugate(c12s)
-    c22s = np.real(c22_r) + 1j * np.imag(c22_r)
-
-    c2_det = c11s * c22s - c12s * c21s
-    c2_trace = c11s + c22s
-
-    sqdiscr = np.sqrt(np.power(c2_trace, 2) - 4 * c2_det)
-
-    lambda1 = (c2_trace + sqdiscr) * 0.5
-    lambda2 = (c2_trace - sqdiscr) * 0.5
-
-    beta = lambda1 / (lambda1 + lambda2)
-
-    return beta.astype(np.float32)
+    return dprvi.astype(np.float32), dop.astype(np.float32), lambda1.astype(np.float32), lambda2.astype(np.float32), beta.astype(np.float32)
 
 @timing
 def _main(settings):
@@ -226,23 +140,19 @@ def _main(settings):
                 c22 = slc_image[3]
     
         # DpRVI
-        dprvi = dprvi_index(c11, c12_real, c12_imag, c22, window_size=3)
+        dprvi, dop, lambda1, lambda2, beta = dprvi_index(c11, c12_real, c12_imag, c22, window_size=5)
         indices_list.append(dprvi)
 
         # DOP
-        dop = dop_op(c11, c12_real, c12_imag, c22, window_size=3)
         indices_list.append(dop)
 
         # Lambda 1
-        lambda1 = lambda1_op(c11, c12_real, c12_imag, c22, window_size=3)
         indices_list.append(lambda1)
 
         # Lambda 2
-        lambda2 = lambda2_op(c11, c12_real, c12_imag, c22, window_size=3)
         indices_list.append(lambda2)
 
         # Beta
-        beta = beta_op(c11, c12_real, c12_imag, c22, window_size=3)
         indices_list.append(beta)
 
         out_meta = slc.meta

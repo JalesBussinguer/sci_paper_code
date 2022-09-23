@@ -1,5 +1,5 @@
 {
-    "path": "E:/thesis_data/RAW/GRD/reprocess/",
+    "path": "E:/thesis_data/RAW/2017/",
     "outpath": "D:/thesis_data/",
     "roi_path": "D:/thesis_data/ROI/ROI_PNB_4326.GEOJSON",
     "preprocessing_method": "dpsvi",

@@ -158,7 +158,7 @@ def dprvi_index(c11, c12_real, c12_imag, c22, window_size):
     c2_det = (c11s * c22s - c12s * c21s)
     c2_trace = c11s + c22s
 
-    dop = (np.sqrt(1.0 - ((4.0 * c2_det) / np.power(c2_trace, 2))))
+    dop = (np.sqrt(1.0 - (4.0 * c2_det/np.power(c2_trace, 2))))
 
     sqdiscr = np.sqrt(np.power(c2_trace, 2) - 4 * c2_det)
 
@@ -169,7 +169,7 @@ def dprvi_index(c11, c12_real, c12_imag, c22, window_size):
 
     dprvi = 1 - (dop * beta)
 
-    return dprvi.astype(np.float32)
+    return dprvi
 
 @timing
 def prvi_index(c11, c12_real, c12_imag, c22, window_size):
@@ -211,7 +211,7 @@ def prvi_index(c11, c12_real, c12_imag, c22, window_size):
     c2_det = (c11s * c22s) - (c12s * c21s)
     c2_trace = c11s + c22s
 
-    dop = (np.sqrt(1.0 - ((4.0 * c2_det) / np.power(c2_trace, 2))))
+    dop = (np.sqrt(1.0 - (4.0 * c2_det / np.power(c2_trace, 2))))
 
     prvi = (1 - dop) * c22s
 
@@ -260,11 +260,11 @@ def _main(settings):
                 vv = grd_image[1]
     
         # DpRVI
-        dprvi = dprvi_index(c11, c12_real, c12_imag, c22, window_size=1)
+        dprvi = dprvi_index(c11, c12_real, c12_imag, c22, window_size=5)
         indices_list.append(dprvi)
 
         # PRVI
-        prvi = prvi_index(c11, c12_real, c12_imag, c22, window_size=1)
+        prvi = prvi_index(c11, c12_real, c12_imag, c22, window_size=5)
         indices_list.append(prvi)
             
         # DPSVI
