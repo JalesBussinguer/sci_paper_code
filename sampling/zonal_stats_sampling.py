@@ -9,14 +9,16 @@ form_florestal = gpd.read_file('D:/thesis_data/ROI/classes/form_florestal_30m_32
 form_savanica = gpd.read_file('D:/thesis_data/ROI/classes/form_savanica_30m_32723_buffer.GEOJSON')
 form_campestre = gpd.read_file('D:/thesis_data/ROI/classes/form_campestre_30m_32723_buffer.GEOJSON')
 
-images_path = 'D:/thesis_data/POL_DECOMP/rasters/'
+images_path = 'D:/thesis_data/SAR/preprocessed/GRD/'
 image_list = os.listdir(images_path)
 
 indices_list = ['DpRVI', 'PRVI', 'DPSVI', 'DPSVIm', 'RVI']
 
 pol_list = ['entropy', 'anisotopy', 'alpha_angle']
 
-for id, indice in enumerate(pol_list, start=1):
+sigma_list = ['VH', 'VV']
+
+for id, indice in enumerate(sigma_list, start=1):
 
     df_florestal_stats = pd.DataFrame()
     df_savanica_stats = pd.DataFrame()
@@ -24,7 +26,7 @@ for id, indice in enumerate(pol_list, start=1):
 
     for index, image in enumerate(image_list):
 
-        date = image_list[index].split('_')[11].split('T')[0]
+        date = image_list[index].split('_')[1].split('T')[0]
 
         florestal = zonal_stats(form_florestal, images_path + image, band=id, nodata=np.nan, stats=['mean', 'median', 'percentile_25', 'percentile_75', 'std'])
 
@@ -52,15 +54,15 @@ for id, indice in enumerate(pol_list, start=1):
     
     df_florestal_stats = df_florestal_stats.reindex(index=df_florestal_stats.index[::-1])
     df_florestal_stats.reset_index(inplace=True, drop=True)
-    df_florestal_stats.to_csv('D:/thesis_data/POL_DECOMP/stats/' + 'florestal_' + indice + '.csv', sep=',', index=False)
+    df_florestal_stats.to_csv('D:/thesis_data/SAR/stats/' + 'florestal_' + indice + '.csv', sep=',', index=False)
     print(f'{indice} florestal csv file saved!')
 
     df_savanica_stats = df_savanica_stats.reindex(index=df_savanica_stats.index[::-1])
     df_savanica_stats.reset_index(inplace=True, drop=True)
-    df_savanica_stats.to_csv('D:/thesis_data/POL_DECOMP/stats/' + 'savanica_' + indice + '.csv', sep=',', index=False)
+    df_savanica_stats.to_csv('D:/thesis_data/SAR/stats/' + 'savanica_' + indice + '.csv', sep=',', index=False)
     print(f'{indice} savanica csv file saved!')
 
     df_campestre_stats = df_campestre_stats.reindex(index=df_campestre_stats.index[::-1])
     df_campestre_stats.reset_index(inplace=True, drop=True)
-    df_campestre_stats.to_csv('D:/thesis_data/POL_DECOMP/stats/' + 'campestre_' + indice + '.csv', sep=',', index=False)
+    df_campestre_stats.to_csv('D:/thesis_data/SAR/stats/' + 'campestre_' + indice + '.csv', sep=',', index=False)
     print(f'{indice} campestre csv file saved!')

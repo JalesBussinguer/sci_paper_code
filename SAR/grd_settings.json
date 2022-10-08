@@ -1,6 +1,6 @@
 {
-    "path": "E:/thesis_data/RAW/2017/",
-    "outpath": "D:/thesis_data/",
+    "path": "E:/thesis_data/RAW/reprocess/",
+    "outpath": "D:/thesis_data/SAR/preprocessed/GRD/",
     "roi_path": "D:/thesis_data/ROI/ROI_PNB_4326.GEOJSON",
     "preprocessing_method": "dpsvi",
     "cache_path": "C:/Users/jales/.snap/var/cache/temp"
