@@ -1,6 +1,6 @@
 {
-    "path": "D:/thesis_data/SAR/RAW/SLC/2019/reprocess/",
-    "outpath": "D:/thesis_data/POL_DECOMP",
+    "path": "D:/thesis_data/SAR/RAW/SLC/2017/",
+    "outpath": "D:/thesis_data/POL_DECOMP/rasters",
     "roi_path": "D:/thesis_data/ROI/ROI_PNB_4326.GEOJSON",
     "preprocessing_method": "pol_decomposition",
     "cache_path": "C:/Users/jales/.snap/var/cache/temp/"
