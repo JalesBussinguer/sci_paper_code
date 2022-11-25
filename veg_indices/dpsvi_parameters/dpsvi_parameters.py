@@ -39,7 +39,7 @@ def timing(func): # Processing time decorator
 @timing
 def idpdd_index(vv, vh):
 
-    idpdd = ((15 - vv) + vh) / 1.4142
+    idpdd = ((10 - vv) + vh) / 1.4142
 
     return idpdd.astype(np.float32)
 
@@ -67,11 +67,13 @@ def dpsvi_index(vv, vh):
         DPSVI (array)
     """
 
-    VV_max = 15
+    idpdd = ((10 - vv) + vh) / 1.4142
+
+    vddpi = (vv + vh) / vv
     
     # np.nanmax(vv) # Maybe use a solver to determine this number
 
-    dpsvi = vh * (VV_max * vh - vv * vh + np.power(vh, 2) + VV_max * vv - np.power(vv, 2) + vh * vv) / (1.4142 * vv)
+    dpsvi = idpdd * vddpi * vh
 
     return dpsvi.astype(np.float32)
 

@@ -12,11 +12,11 @@ form_campestre = gpd.read_file('D:/thesis_data/ROI/classes/form_campestre_30m_32
 images_path = 'D:/thesis_data/VEG_INDICES/dpsvi_parameters/raster/'
 image_list = os.listdir(images_path)
 
-indices_list = ['IDPDD', 'VDDPI', 'DPSVI_10']
+indices_list = ['IDPDD', 'VDDPI', 'DPSVI']
 
-id = 3
+id = 1
 
-indice = 'DPSVI_10'
+indice = 'IDPDD'
 
 df_florestal_stats = pd.DataFrame()
 df_savanica_stats = pd.DataFrame()
@@ -50,17 +50,11 @@ for index, image in enumerate(image_list, start=0):
 
     print(f'{indice} - {date} campestre data collected!')
 
-df_florestal_stats = df_florestal_stats.reindex(index=df_florestal_stats.index[::-1])
-df_florestal_stats.reset_index(inplace=True, drop=True)
 df_florestal_stats.to_csv('D:/thesis_data/VEG_INDICES/dpsvi_parameters/stats/' + 'florestal_' + indice + '.csv', sep=',', index=False)
 print(f'{indice} florestal csv file saved!')
 
-df_savanica_stats = df_savanica_stats.reindex(index=df_savanica_stats.index[::-1])
-df_savanica_stats.reset_index(inplace=True, drop=True)
 df_savanica_stats.to_csv('D:/thesis_data/VEG_INDICES/dpsvi_parameters/stats/' + 'savanica_' + indice + '.csv', sep=',', index=False)
 print(f'{indice} savanica csv file saved!')
 
-df_campestre_stats = df_campestre_stats.reindex(index=df_campestre_stats.index[::-1])
-df_campestre_stats.reset_index(inplace=True, drop=True)
 df_campestre_stats.to_csv('D:/thesis_data/VEG_INDICES/dpsvi_parameters/stats/' + 'campestre_' + indice + '.csv', sep=',', index=False)
 print(f'{indice} campestre csv file saved!')
