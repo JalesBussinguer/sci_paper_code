@@ -1,0 +1,6 @@
+{
+    "epsg": "EPSG:32723",
+    "roi_path": "D:/thesis_data/ROI/PNB_32723.GEOJSON",
+    "grd_image": "D:/thesis_data/SAR/preprocessed/GRD",
+    "indices_outpath": "D:/thesis_data/VEG_INDICES/dpsvim_parameters/raster"
+}
