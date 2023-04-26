@@ -9,7 +9,7 @@ form_florestal = gpd.read_file('D:/thesis_data/ROI/classes/form_florestal_30m_32
 form_savanica = gpd.read_file('D:/thesis_data/ROI/classes/form_savanica_30m_32723_buffer.GEOJSON')
 form_campestre = gpd.read_file('D:/thesis_data/ROI/classes/form_campestre_30m_32723_buffer.GEOJSON')
 
-images_path = 'D:/thesis_data/SAR/preprocessed/GRD/'
+images_path = 'D:/thesis_data/VEG_INDICES/raster/'
 image_list = os.listdir(images_path)
 
 indices_list = ['DpRVI', 'PRVI', 'DPSVI', 'DPSVIm', 'RVI']
@@ -18,7 +18,9 @@ pol_list = ['entropy', 'anisotopy', 'alpha_angle']
 
 sigma_list = ['VH', 'VV']
 
-for id, indice in enumerate(sigma_list, start=1):
+c2_list = ['c11', 'c12_real', 'c12_imag', 'C22']
+
+for id, indice in enumerate(indices_list, start=1):
 
     df_florestal_stats = pd.DataFrame()
     df_savanica_stats = pd.DataFrame()
@@ -26,7 +28,7 @@ for id, indice in enumerate(sigma_list, start=1):
 
     for index, image in enumerate(image_list):
 
-        date = image_list[index].split('_')[1].split('T')[0]
+        date = image_list[index].split('T')[0]
 
         florestal = zonal_stats(form_florestal, images_path + image, band=id, nodata=np.nan, stats=['mean', 'median', 'percentile_25', 'percentile_75', 'std'])
 

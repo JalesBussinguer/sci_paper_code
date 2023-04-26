@@ -39,7 +39,7 @@ def timing(func): # Processing time decorator
 @timing
 def idpdd_index(vv, vh):
 
-    idpdd = ((10 - vv) + vh) / 1.4142
+    idpdd = ((5 - vv) + vh) / 1.4142
 
     return idpdd.astype(np.float32)
 
@@ -67,7 +67,7 @@ def dpsvi_index(vv, vh):
         DPSVI (array)
     """
 
-    idpdd = ((10 - vv) + vh) / 1.4142
+    idpdd = ((5 - vv) + vh) / 1.4142
 
     vddpi = (vv + vh) / vv
     
@@ -102,8 +102,9 @@ def _main(settings):
 
                 grd_image, grd_transform = mask(grd, geometries, crop=True, nodata=np.nan)
 
-                vv = grd_image[0]
-                vh = grd_image[1]
+                vh = grd_image[0]
+                vv = grd_image[1]
+                
 
         # IDPDD
         idpdd = idpdd_index(vv, vh)

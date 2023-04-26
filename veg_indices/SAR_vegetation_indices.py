@@ -90,11 +90,10 @@ def dpsvi_index(vv, vh):
         DPSVI (array)
     """
 
-    VV_max = np.nanmax(vv)
     
     # np.nanmax(vv) # Maybe use a solver to determine this number
 
-    dpsvi = vh * (VV_max * vh - vv * vh + np.power(vh, 2) + VV_max * vv - np.power(vv, 2) + vh * vv) / (1.4142 * vv)
+    dpsvi = vh * (5 * vh - vv * vh + np.power(vh, 2) + 5  * vv - np.power(vv, 2) + vh * vv) / (1.4142 * vv)
 
     return dpsvi.astype(np.float32)
 
@@ -232,6 +231,8 @@ def _main(settings):
 
         if slc_image.endswith('.tif'):
 
+            date = slc_image.split('_')[1]
+
             slc_file = settings['slc_image'] + '/' + slc_image
 
             # SAR SLC image
@@ -239,16 +240,16 @@ def _main(settings):
 
                 slc_image, slc_transform = mask(slc, geometries, crop=True, nodata=np.nan)
 
-                c11 = slc_image[0]
+                c11 = slc_image[0] # VV
                 c12_real = slc_image[1]
                 c12_imag = slc_image[2]
-                c22 = slc_image[3]
+                c22 = slc_image[3] # VH
         
+
         grd_image = os.listdir(settings['grd_image'])[i]
 
         if grd_image.endswith('.tif'):
 
-            date = grd_image.split('_')[1]
             grd_file = settings['grd_image'] + '/' + grd_image
 
             # SAR GRD image

@@ -12,11 +12,11 @@ form_campestre = gpd.read_file('D:/thesis_data/ROI/classes/form_campestre_30m_32
 images_path = 'D:/thesis_data/VEG_INDICES/dpsvim_parameters/raster/'
 image_list = os.listdir(images_path)
 
-indices_list = ['DPDD', 'CR']
+indices_list = ['DPDD', 'CR', 'DPSVIm']
 
-id = 2
+id = 3
 
-indice = 'CR'
+indice = 'DPSVIm'
 
 df_florestal_stats = pd.DataFrame()
 df_savanica_stats = pd.DataFrame()
@@ -26,7 +26,7 @@ for index, image in enumerate(image_list, start=0):
 
     date = image_list[index].split('_')[2].split('.')[0]
 
-    florestal = zonal_stats(form_florestal, images_path + image, band=id, nodata=np.nan, stats=['mean', 'median', 'percentile_25', 'percentile_75', 'std'])
+    florestal = zonal_stats(form_florestal, images_path + image, band=id, nodata=np.nan, stats=['median', 'percentile_25', 'percentile_75', 'std'])
 
     florestal_stats = pd.DataFrame(florestal)
     florestal_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')
@@ -34,7 +34,7 @@ for index, image in enumerate(image_list, start=0):
 
     print(f'{indice} - {date} florestal data collected')
 
-    savanica = zonal_stats(form_savanica, images_path + image, band=id, nodata=np.nan, stats=['mean', 'median', 'percentile_25', 'percentile_75', 'std'])
+    savanica = zonal_stats(form_savanica, images_path + image, band=id, nodata=np.nan, stats=['median', 'percentile_25', 'percentile_75', 'std'])
 
     savanica_stats = pd.DataFrame(savanica)
     savanica_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')
@@ -42,7 +42,7 @@ for index, image in enumerate(image_list, start=0):
 
     print(f'{indice} - {date} savanica data collected!')
 
-    campestre = zonal_stats(form_campestre, images_path + image, band=id, nodata=np.nan, stats=['mean', 'median', 'percentile_25', 'percentile_75', 'std'])
+    campestre = zonal_stats(form_campestre, images_path + image, band=id, nodata=np.nan, stats=['median', 'percentile_25', 'percentile_75', 'std'])
 
     campestre_stats = pd.DataFrame(campestre)
     campestre_stats['date'] = pd.to_datetime(int(date), format='%Y%m%d')

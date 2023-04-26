@@ -158,6 +158,16 @@ def ApplyOrbitFile(source):
     return GPF.createProduct('Apply-Orbit-File', parameters, source)
 
 @timing
+def ThermalNoiseRemoval(source):
+
+    parameters = HashMap()
+
+    parameters.put('selectedPolarisations', 'VH,VV') # Polarisations
+    parameters.put('removeThermalNoise', 'true') # Remove Thermal Noise
+
+    return GPF.createProduct('ThermalNoiseRemoval', parameters, source)
+
+@timing
 def Calibration(source):
 
     """
@@ -180,7 +190,7 @@ def Calibration(source):
     parameters = HashMap()
 
     parameters.put('selectedPolarisations', 'VH,VV')
-    parameters.put('outputImageInComplex', 'true')
+    parameters.put('outputSigmaBand', 'true')
     parameters.put('outputImageScaleInDb', 'false')
 
     return GPF.createProduct('Calibration', parameters, source)
@@ -256,10 +266,20 @@ def Multilooking(source):
 
     parameters.put('nRgLooks', 4)
     parameters.put('nAzLooks', 1)
-    parameters.put('outputIntensity', 'false')
+    parameters.put('outputIntensity', 'true')
     parameters.put('grSquarePixel', 'true')
 
     return GPF.createProduct('Multilook', parameters, source)
+
+@timing
+def SR2GR(source):
+
+    parameters = HashMap()
+
+    parameters.put('warpPolynomialOrder', 4)
+    parameters.put('interpolationMethod', 'Nearest-neighbor interpolation')
+
+    return GPF.createProduct('SRGR', parameters, source)
 
 @timing
 def C2_Matrix(source):
@@ -314,6 +334,37 @@ def PolarimetricSpeckleFilter(source, filter, window_size='5x5'):
     parameters.put('windowSize', window_size)
     
     return GPF.createProduct('Polarimetric-Speckle-Filter', parameters, source)
+
+@timing
+def SpeckleFilter(source, filter, size_x=3, size_y=3):
+
+    """
+    Speckle Filter Operator
+
+    SAR images have inherent salt and pepper like texturing called speckles which degrade the quality of the image and make interpretation of features more difficult. 
+    Speckles are caused by random constructive and destructive interference of the de-phased but coherent return waves scattered by the elementary scatters within each resolution cell. 
+    Speckle noise reduction can be applied either by spatial filtering or multilook processing.
+
+    Filters supported: 'Boxcar', 'Median', 'Frost', 'Gamma Map', 'Lee', 'Refined Lee', 'Lee Sigma', 'IDAN'
+
+    Args:
+    source (array) = Sentinel-1 product
+    filter (string) = selected filter
+    size_x = size of the moving window in x. Default = 3
+    seize_y = size of the the moving window in y. Default = 3
+    
+    Returns:
+        Calibrated image (array)
+    """ 
+
+    parameters = HashMap()
+
+    parameters.put('filter', filter)
+    parameters.put('filterSizeX', size_x)
+    parameters.put('filterSizeY', size_y)
+    parameters.put('estimateENL', 'true')
+
+    return GPF.createProduct('Speckle-Filter', parameters, source)
 
 @timing
 def PolarimetricDecomposition(source, window_size='3'):
@@ -390,29 +441,6 @@ def Subset(source, wkt):
     return GPF.createProduct('Subset', parameters, source)
 
 @timing
-def DpRVI_Index(source, window_size=3):
-
-    """
-    Dual Polarization Radar Vegetation Index Operator
-    
-    Reference: DOI:10.1016/j.rse.2020.111954
-    
-    Window sizes supported: 3, 5, 7, 9, 11, 13, 15, 17, 19
-    
-    Args:
-    source (product) = Sentinel-1 product object
-    window_size (int) = The sliding window size
-    Returns:
-        Calibrated image (product)
-    """ 
-
-    parameters = HashMap()
-
-    parameters.put('windowSize', window_size)
-
-    return GPF.createProduct('Radar-Vegetation-Index', parameters, source)
-
-@timing
 def get_georegion_wkt(roi_path):
 
     """
@@ -435,6 +463,45 @@ def get_georegion_wkt(roi_path):
     wkt = bbox.wkt
 
     return wkt
+
+@timing
+def slc2grd(product, roi_wkt, outpath, file, date, roi_path):
+
+    iw_dict = swath_detection(file, roi_path)
+
+    product_dict = {}
+
+    for swath, bursts in iw_dict.items():
+
+        S1_split = TopsarSplit(product, swath, bursts)
+
+        S1_split_Orb = ApplyOrbitFile(S1_split)
+
+        #S1_split_Orb_TNR = ThermalNoiseRemoval(S1_split_Orb)
+
+        S1_split_Orb_TNR_Cal = Calibration(S1_split_Orb)
+
+        S1_split_Orb_TNR_Cal_Deb = TopsarDeburst(S1_split_Orb_TNR_Cal)
+
+        product_dict[swath] = S1_split_Orb_TNR_Cal_Deb
+
+    products = list(product_dict.values())
+
+    S1_split_Orb_TNR_Cal_Deb_Merge = TopsarMerge(products) if len(products) > 1 else products[0]
+
+    S1_split_Orb_TNR_Cal_Deb_Merge_Mul = Multilooking(S1_split_Orb_TNR_Cal_Deb_Merge)
+
+    S1_split_Orb_TNR_Cal_Deb_Merge_Mul_Spk = SpeckleFilter(S1_split_Orb_TNR_Cal_Deb_Merge_Mul, 'Refined Lee') #5x5
+
+    S1_split_Orb_TNR_Cal_Deb_Merge_Mul_Spk_SRGR = SR2GR(S1_split_Orb_TNR_Cal_Deb_Merge_Mul_Spk)
+
+    S1_split_Orb_TNR_Cal_Deb_Merge_Mul_Spk_SRGR_Ter = TerrainCorrection(S1_split_Orb_TNR_Cal_Deb_Merge_Mul_Spk_SRGR)
+
+    S1_split_Orb_TNR_Cal_Deb_Merge_Mul_Spk_SRGR_Ter_Sub = Subset(S1_split_Orb_TNR_Cal_Deb_Merge_Mul_Spk_SRGR_Ter, wkt=roi_wkt)
+
+    ProductIO.writeProduct(S1_split_Orb_TNR_Cal_Deb_Merge_Mul_Spk_SRGR_Ter_Sub, outpath + '/' + 'GRD' + '_' + date + '_' + '32723', 'GeoTIFF')
+
+    return print('SLC TO GRD: Done')
 
 @timing
 def pol_decomposition(product, roi_wkt, outpath, file, date, roi_path):
@@ -472,47 +539,6 @@ def pol_decomposition(product, roi_wkt, outpath, file, date, roi_path):
     return print('Polarimetric Decomposition: Done')
 
 @timing
-def dprvi_preprocessing(product, roi_wkt, outpath, file, date, roi_path):
-
-    # Reference: DOI:10.1016/j.rse.2020.111954.
-
-    iw_dict = swath_detection(file, roi_path)
-
-    product_dict = {}
-
-    for swath, bursts in iw_dict.items():
-
-        S1_split = TopsarSplit(product, swath, bursts)
-
-        S1_split_Orb = ApplyOrbitFile(S1_split)
-
-        S1_split_Orb_Cal = Calibration(S1_split_Orb)
-
-        S1_split_Orb_Cal_Deb = TopsarDeburst(S1_split_Orb_Cal)
-
-        product_dict[swath] = S1_split_Orb_Cal_Deb
-
-    products = list(product_dict.values())
-
-    S1_split_Orb_Deb_Merge = TopsarMerge(products) if len(products) > 1 else products[0]
-
-    S1_split_Orb_Cal_Deb_Sub = Subset(S1_split_Orb_Deb_Merge, wkt=roi_wkt)
-
-    S1_split_Orb_Cal_Deb_Sub_Mul = Multilooking(S1_split_Orb_Cal_Deb_Sub)
-
-    S1_split_Orb_Cal_Deb_Sub_Mul_C2 = C2_Matrix(S1_split_Orb_Cal_Deb_Sub_Mul)
-
-    S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk = PolarimetricSpeckleFilter(S1_split_Orb_Cal_Deb_Sub_Mul_C2, 'Refined Lee Filter')
-
-    S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_DpRVI = DpRVI_Index(S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk)
-
-    S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_DpRVI_TC = TerrainCorrection(S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_DpRVI)
-
-    ProductIO.writeProduct(S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_DpRVI_TC, outpath + '/' + 'S1_split_Orb_Cal_Deb_Sub_Mul_C2_Spk_DpRVI_TC'+'_'+date+'_'+'32723', 'GeoTIFF')
-
-    return print('SLC preprocessing for DpRVI: Done')
-
-@timing
 def prvi_preprocessing(product, roi_wkt, outpath, file, date, roi_path):
 
     iw_dict = swath_detection(file, roi_path)
@@ -545,7 +571,7 @@ def prvi_preprocessing(product, roi_wkt, outpath, file, date, roi_path):
 
     S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC_Sub = Subset(S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC, wkt=roi_wkt)
 
-    ProductIO.writeProduct(S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC_Sub, outpath + '/' + 'C2'+'_'+date+'_'+'32723', 'GeoTIFF')
+    ProductIO.writeProduct(S1_split_Orb_Cal_Deb_Mul_C2_Spk_TC_Sub, outpath + '/' + 'GRD'+'_'+date+'_'+'32723', 'GeoTIFF')
 
     return print('SLC preprocessing for PRVI: Done')
 
@@ -562,9 +588,9 @@ def _main(settings):
         os.makedirs(settings['outpath'])
     
     func_dict = {
-        'dprvi': dprvi_preprocessing,
         'prvi': prvi_preprocessing,
-        'pol_decomposition': pol_decomposition
+        'pol_decomposition': pol_decomposition,
+        'slc2grd': slc2grd
     }
     
     preprocessing_method = settings['preprocessing_method']

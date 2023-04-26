@@ -1,7 +1,7 @@
 {
-    "path": "D:/thesis_data/SAR/RAW/SLC/2017/",
-    "outpath": "D:/thesis_data/POL_DECOMP/rasters",
+    "path": "D:/thesis_data/SAR/RAW/SLC/reprocess/",
+    "outpath": "D:/thesis_data/SAR/preprocessed/GRD/",
     "roi_path": "D:/thesis_data/ROI/ROI_PNB_4326.GEOJSON",
-    "preprocessing_method": "pol_decomposition",
+    "preprocessing_method": "slc2grd",
     "cache_path": "C:/Users/jales/.snap/var/cache/temp/"
 }

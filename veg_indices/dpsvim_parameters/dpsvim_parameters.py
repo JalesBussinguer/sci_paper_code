@@ -95,8 +95,9 @@ def _main(settings):
 
                 grd_image, grd_transform = mask(grd, geometries, crop=True, nodata=np.nan)
 
-                vv = grd_image[0]
-                vh = grd_image[1]
+                vh = grd_image[0]
+                vv = grd_image[1]
+               
 
         # DPDD
         dpdd = dpdd_index(vv, vh)
@@ -105,6 +106,11 @@ def _main(settings):
         # CR
         cr = cr_index(vv, vh)
         indices_list.append(cr)
+
+        # DPSVIm
+        dpsvim = dpsvim_index(vv, vh)
+        indices_list.append(dpsvim)
+
 
         out_meta = grd.meta
 
