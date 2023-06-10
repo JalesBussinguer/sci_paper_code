@@ -2,15 +2,15 @@ from fitter import Fitter
 import pandas as pd
 import os
 
-florestal_path = 'D:/thesis_data/VEG_INDICES/samples/florestal/'
-savanica_path = 'D:/thesis_data/VEG_INDICES/samples/savanica/'
-campestre_path = 'D:/thesis_data/VEG_INDICES/samples/campestre/'
+florestal_path = 'D:/thesis_data/VEG_INDICES/samples/ff_dists/'
+savanica_path = 'D:/thesis_data/VEG_INDICES/samples/fs_dists/'
+campestre_path = 'D:/thesis_data/VEG_INDICES/samples/fc_dists/'
 
 florestal_files_list = os.listdir(florestal_path)
 savanica_files_list = os.listdir(savanica_path)
 campestre_files_list = os.listdir(campestre_path)
 
-dataframe = pd.DataFrame( )
+dataframe = pd.DataFrame()
 
 for id, file in enumerate(florestal_files_list):
 
@@ -20,7 +20,7 @@ for id, file in enumerate(florestal_files_list):
     date_fs = pd.read_csv(savanica_path + savanica_files_list[id])
     date_fc = pd.read_csv(campestre_path + campestre_files_list[id])
 
-    f = Fitter(date_fs['DpRVI'], distributions=['norm', 'lognorm', 'gamma', 'loggamma', 'expon', 'logistic', 'rayleigh'])
+    f = Fitter(date_fc['DPSVI'], distributions=['norm', 'lognorm'])
     fit = f.fit()
     test = f.summary()
 
@@ -36,5 +36,5 @@ for id, file in enumerate(florestal_files_list):
 
     print(f'test {id} done!')
 
-dataframe.to_csv('D:/thesis_data/VEG_INDICES/stats/fit_tests/FS_DpRVI_fit_test.csv', sep=',', index=False)
+dataframe.to_csv('D:/thesis_data/VEG_INDICES/stats/fit_tests/FF_DpRVI_fit_test.csv', sep=',', index=False)
 print(f'Fit test csv file saved!')
