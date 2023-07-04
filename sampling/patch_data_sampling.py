@@ -6,13 +6,13 @@ import pandas as pd
 import os
 
 
-form_florestal = gpd.read_file('D:/thesis_data/ROI/sampling/sample_grid_mapbiomas/FF_mapbiomas_50_sampling_grids_20m_32723.GEOJSON')
+form_florestal = gpd.read_file('D:/thesis_data/ROI/sampling/sample_grid_mapbiomas/FF_mapbiomas_250_sampling_grids_100x100m_32723.GEOJSON')
 florestal_geom = [geom for geom in form_florestal.geometry]
 
-form_savanica = gpd.read_file('D:/thesis_data/ROI/sampling/sample_grid_mapbiomas/FS_mapbiomas_50_sampling_grids_20m_32723.GEOJSON')
+form_savanica = gpd.read_file('D:/thesis_data/ROI/sampling/sample_grid_mapbiomas/FS_mapbiomas_250_sampling_grids_100x100m_32723.GEOJSON')
 savanica_geom = [geom for geom in form_savanica.geometry]
 
-form_campestre = gpd.read_file('D:/thesis_data/ROI/sampling/sample_grid_mapbiomas/FC_mapbiomas_50_sampling_grids_20m_32723.GEOJSON')
+form_campestre = gpd.read_file('D:/thesis_data/ROI/sampling/sample_grid_mapbiomas/FC_mapbiomas_250_sampling_grids_100x100m_32723.GEOJSON')
 campestre_geom = [geom for geom in form_campestre.geometry]
 
 raster_path = 'D:/thesis_data/VEG_INDICES/raster/'
@@ -46,7 +46,7 @@ for index, image in enumerate(indices_list):
 
         df_ff.dropna(inplace=True)
 
-    df_ff.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/florestal/20m/' + 'FF_' + date + '_20m_patches' + '.csv', sep=',', index=False)
+    df_ff.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/florestal/100m/' + 'FF_' + date + '_100x100m_patches' + '.csv', sep=',', index=False)
 
     print(f'Forest data patches of {date} collected!')
 
@@ -77,7 +77,7 @@ for index, image in enumerate(indices_list):
 
         df_fs.dropna(inplace=True)
 
-    df_fs.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/savanica/20m/' + 'FS_' + date + '_20m_patches' + '.csv', sep=',', index=False)
+    df_fs.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/savanica/100m/' + 'FS_' + date + '_100x100m_patches' + '.csv', sep=',', index=False)
 
     print(f'Savanna data patches of {date} collected!')
 
@@ -108,5 +108,5 @@ for index, image in enumerate(indices_list):
 
         df_fc.dropna(inplace=True)
 
-    df_fc.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/campestre/20m/' + 'FC_' + date + '_20m_patches' + '.csv', sep=',', index=False)
+    df_fc.to_csv('D:/thesis_data/VEG_INDICES/samples/stratified/campestre/100m/' + 'FC_' + date + '_100x100m_patches' + '.csv', sep=',', index=False)
     print(f'Grasslands data patches of {date} collected!')
